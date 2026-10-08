@@ -10,13 +10,9 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
-
         public string DocumentType { get; set; }
-
         public string FilePath { get; set; }
-
         public string VerificationStatus { get; set; }
-
         public Customer? Customer { get; set; }
     }
 }

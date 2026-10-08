@@ -10,15 +10,10 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("LoanAccount")]
         public int LoanAccountId { get; set; }
-
         public int InstallmentNo { get; set; }
-
         public DateTime DueDate { get; set; }
-
         public decimal Emi { get; set; }
-
         public decimal PrincipalAmount { get; set; }
-
         public decimal InterestAmount { get; set; }
 
         public decimal OpeningBalance { get; set; }

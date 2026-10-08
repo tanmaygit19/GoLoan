@@ -13,21 +13,13 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("LoanAccount")]
         public int LoanAccountId { get; set; }
-
         public string Subject { get; set; }
-
         public string Description { get; set; }
-
         public string? AttachmentPath { get; set; }
-
         public DateTime CreatedDate { get; set; }
-
         public string Status { get; set; }
-
         public string? OfficerResponse { get; set; }
-
         public Customer? Customer { get; set; }
-
         public LoanAccount? LoanAccount { get; set; }
     }
 }

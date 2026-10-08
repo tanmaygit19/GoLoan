@@ -13,19 +13,12 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("EmiSchedule")]
         public int EmiScheduleId { get; set; }
-
         public string PenaltyType { get; set; }
-
         public decimal PenaltyAmount { get; set; }
-
         public int DelayDays { get; set; }
-
         public DateTime AppliedDate { get; set; }
-
         public string Status { get; set; }
-
         public LoanAccount? LoanAccount { get; set; }
-
         public EmiSchedule? EmiSchedule { get; set; }
     }
 }
