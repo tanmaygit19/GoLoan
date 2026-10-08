@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="Exception\" />
+    <Folder Include="Views\" />
   </ItemGroup>
 
 </Project>
