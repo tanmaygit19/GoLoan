@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GoLoan.Application/GoLoan.Application.csproj" />
+  <Project Path="GoLoan.Domain/GoLoan.Domain.csproj" />
+  <Project Path="GoLoan.Infrastructure/GoLoan.Infrastructure.csproj" />
+  <Project Path="GoLoan/GoLoan.csproj" />
+</Solution>

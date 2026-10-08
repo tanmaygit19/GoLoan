@@ -1,0 +1,6 @@
+@GoLoan_HostAddress = http://localhost:5047
+
+GET {{GoLoan_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
