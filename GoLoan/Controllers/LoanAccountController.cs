@@ -7,5 +7,6 @@ namespace GoLoan.Controllers
     [ApiController]
     public class LoanAccountController : ControllerBase
     {
+        
     }
 }

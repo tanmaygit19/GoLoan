@@ -1,4 +1,5 @@
-﻿using GoLoan.Application.Interfaces;
+﻿using GoLoan.Application.DTO;
+using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
 using GoLoan.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,12 @@ namespace GoLoan.Infrastructure.Repositories
             await db.LoanAccounts.AddAsync(acc);
             await db.SaveChangesAsync();
         }
-            
+
+        public Task<LoanAccountDTO> CreateLoanAccount(int dealId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<LoanAccount>> GetAccounts()
         {
             return await db.LoanAccounts.ToListAsync();
