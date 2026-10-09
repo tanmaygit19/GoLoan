@@ -16,7 +16,7 @@ namespace GoLoan.Application.Interfaces
         Task<LoanAccount?> GetById(int id);
 
         Task AddLoanAccount(LoanAccount acc);
-        Task<LoanAccountDTO> CreateLoanAccount(int dealId);
+        Task<LoanAccountDTO> CreateLoanAccount(int id);
 
     }
 }

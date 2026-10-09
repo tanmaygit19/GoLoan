@@ -1,10 +1,12 @@
-﻿using GoLoan.Application.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using AutoMapper;
+using GoLoan.Application.DTO;
+using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
 using GoLoan.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GoLoan.Infrastructure.Repositories
 {
@@ -12,9 +14,11 @@ namespace GoLoan.Infrastructure.Repositories
 
     {
         private readonly AppDbContext db;
-        public LoanAccountService(AppDbContext db)
+        private readonly  IMapper mapper;
+        public LoanAccountService(AppDbContext db, IMapper mapper)
         {
             this.db = db;
+            this.mapper = mapper;
         }
         public async Task<bool> AccountExist(int id)
         {
@@ -26,7 +30,12 @@ namespace GoLoan.Infrastructure.Repositories
             await db.LoanAccounts.AddAsync(acc);
             await db.SaveChangesAsync();
         }
-            
+
+        public Task<LoanAccountDTO> CreateLoanAccount(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<LoanAccount>> GetAccounts()
         {
             return await db.LoanAccounts.ToListAsync();
