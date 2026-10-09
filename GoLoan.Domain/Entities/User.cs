@@ -21,6 +21,6 @@ namespace GoLoan.Domain.Entities
         public string Password { get; set; }
         public Role? Role { get; set; }
         public Customer? Customer { get; set; }
-        public ICollection<DealReview>? DealReviews { get; set; }
+        public List<DealReview>? DealReviews { get; set; }
     }
 }

@@ -36,9 +36,9 @@ namespace GoLoan.Domain.Entities
         public string? RejectionReason { get; set; }
         public DateTime AppliedDate { get; set; } = DateTime.Now;
         public Customer? Customer { get; set; }
-        public ICollection<DealReview>? DealReviews { get; set; }
-        public ICollection<SanctionLetter>? SanctionLetters { get; set; }
-        public ICollection<Disbursement>? Disbursements { get; set; }
+        public List<DealReview>? DealReviews { get; set; }
+        public List<SanctionLetter>? SanctionLetters { get; set; }
+        public List<Disbursement>? Disbursements { get; set; }
 
     }
 }
