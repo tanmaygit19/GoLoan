@@ -30,8 +30,9 @@ namespace GoLoan.Domain.Entities
         public DateTime? PaidDate { get; set; }
 
         public LoanAccount? LoanAccount { get; set; }
+        public string? RazorpayOrderId { get; set; }
 
-        
+
     }
 }
 

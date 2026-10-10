@@ -1,24 +1,32 @@
+
 using Microsoft.EntityFrameworkCore;
 using GoLoan.Infrastructure.Data;
+using GoLoan.Application.Interfaces;
+using GoLoan.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<AppDbContext>(option =>
     option.UseSqlServer(
         builder.Configuration.GetConnectionString("dbconn")
     ));
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register ForeClosure service
+builder.Services.AddScoped<IForeClosureService, ForeClosureService>();
+builder.Services.AddScoped<RazorpayService>();
+builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

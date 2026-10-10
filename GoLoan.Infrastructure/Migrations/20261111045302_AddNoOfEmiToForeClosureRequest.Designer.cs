@@ -4,6 +4,7 @@ using GoLoan.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoLoan.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261111045302_AddNoOfEmiToForeClosureRequest")]
+    partial class AddNoOfEmiToForeClosureRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,9 +235,6 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<decimal>("PrincipalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("RazorpayOrderId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
@@ -277,9 +277,6 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("RazorpayOrderId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -526,9 +523,6 @@ namespace GoLoan.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
 
-                    b.Property<int>("EmiScheduleId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("InterestPaid")
                         .HasColumnType("decimal(18,2)");
 
@@ -564,8 +558,6 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentId");
-
-                    b.HasIndex("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
 
@@ -947,19 +939,11 @@ namespace GoLoan.Infrastructure.Migrations
 
             modelBuilder.Entity("GoLoan.Domain.Entities.LoanPayment", b =>
                 {
-                    b.HasOne("GoLoan.Domain.Entities.EmiSchedule", "EmiSchedule")
-                        .WithMany()
-                        .HasForeignKey("EmiScheduleId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("GoLoan.Domain.Entities.LoanAccount", "LoanAccount")
                         .WithMany()
                         .HasForeignKey("LoanAccountId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("EmiSchedule");
 
                     b.Navigation("LoanAccount");
                 });

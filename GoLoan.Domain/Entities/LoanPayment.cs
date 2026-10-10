@@ -11,6 +11,11 @@ namespace GoLoan.Domain.Entities
         [ForeignKey("LoanAccount")]
         public int LoanAccountId { get; set; }
 
+        [ForeignKey("EmiSchedule")]
+        public int EmiScheduleId { get; set; }
+
+        public EmiSchedule? EmiSchedule { get; set; }
+
         public string PaymentName { get; set; }
 
         public DateTime PaymentDate { get; set; }

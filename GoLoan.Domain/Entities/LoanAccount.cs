@@ -37,9 +37,5 @@ namespace GoLoan.Domain.Entities
         public Customer? Customer { get; set; }
 
         public LoanDeal? LoanDeal { get; set; }
-        // [ForeignKey("Disbursement")]
-        //  public int DisbursementId { get; set; }
-
-        // public Disbursement? Disbursement { get; set; }
     }
 }

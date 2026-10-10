@@ -11,18 +11,12 @@ namespace GoLoan.Domain.Entities
         [ForeignKey("LoanAccount")]
         public int LoanAccountId { get; set; }
 
-        // Full / Partial
-
         [Required]
         public string ForeClosureType { get; set; }
 
-        // Final Amount with charges
-
         public decimal ForeClosureAmount { get; set; }
 
-        // Only for Partial Foreclosure
-
-        public decimal PartialAmount { get; set; }
+        public int? NoOfEmi { get; set; }
 
         public DateTime RequestedDate { get; set; }
 
@@ -36,11 +30,10 @@ namespace GoLoan.Domain.Entities
 
         public DateTime? ApprovedDate { get; set; }
 
-        // Payment Status
-
         public bool IsPaid { get; set; } = false;
 
         public DateTime? PaidDate { get; set; }
+        public string? RazorpayOrderId { get; set; }
 
         [ForeignKey("User")]
         public int? ClosedBy { get; set; }
