@@ -13,8 +13,11 @@ namespace GoLoan.Domain.Entities
 
         [Required]
         public string ForeClosureType { get; set; }
+
         public decimal ForeClosureAmount { get; set; }
-        public decimal PartialAmount { get; set; }
+
+        public int? NoOfEmi { get; set; }
+
         public DateTime RequestedDate { get; set; }
 
         [Required]
@@ -24,8 +27,10 @@ namespace GoLoan.Domain.Entities
         public string Reason { get; set; }
         public string Status { get; set; }
         public DateTime? ApprovedDate { get; set; }
+
         public bool IsPaid { get; set; } = false;
         public DateTime? PaidDate { get; set; }
+        public string? RazorpayOrderId { get; set; }
 
         [ForeignKey("User")]
         public int? ClosedBy { get; set; }

@@ -20,7 +20,9 @@ namespace GoLoan.Domain.Entities
         public string PaymentStatus { get; set; }
         public DateTime? PaidDate { get; set; }
         public LoanAccount? LoanAccount { get; set; }
-        
+        public string? RazorpayOrderId { get; set; }
+
+
     }
 }
 

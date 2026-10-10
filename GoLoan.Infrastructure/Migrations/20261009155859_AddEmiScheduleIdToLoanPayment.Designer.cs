@@ -4,6 +4,7 @@ using GoLoan.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoLoan.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261009155859_AddEmiScheduleIdToLoanPayment")]
+    partial class AddEmiScheduleIdToLoanPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,9 +235,6 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<decimal>("PrincipalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("RazorpayOrderId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
@@ -280,11 +280,6 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<string>("RazorpayOrderId")
                         .HasColumnType("nvarchar(max)");
-                    b.Property<DateTime?>("PaidDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("PartialAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -385,9 +380,6 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<DateTime>("DisbursementDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DisbursementId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("EmiAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -419,8 +411,6 @@ namespace GoLoan.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("DealId");
-
-                    b.HasIndex("DisbursementId");
 
                     b.ToTable("LoanAccounts");
                 });
@@ -921,16 +911,6 @@ namespace GoLoan.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
-
-                    b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
-                        .WithMany()
-                        .HasForeignKey("DisbursementId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Disbursement");
 
                     b.Navigation("LoanDeal");
                 });

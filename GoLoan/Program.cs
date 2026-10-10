@@ -1,3 +1,8 @@
+
+using Microsoft.EntityFrameworkCore;
+using GoLoan.Infrastructure.Data;
+using GoLoan.Application.Interfaces;
+using GoLoan.Infrastructure.Repositories;
 using GoLoan.Application.Interfaces;
 using GoLoan.Application.Mapper;
 using GoLoan.Infrastructure.Data;
@@ -7,14 +12,20 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<AppDbContext>(option =>
     option.UseSqlServer(
         builder.Configuration.GetConnectionString("dbconn")
     ));
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register ForeClosure service
+builder.Services.AddScoped<IForeClosureService, ForeClosureService>();
+builder.Services.AddScoped<RazorpayService>();
+builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
 
 builder.Services.AddHangfire(configuration =>
     configuration.UseSqlServerStorage(
@@ -46,7 +57,6 @@ recurringJobManager.AddOrUpdate<INotificationService>(
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
