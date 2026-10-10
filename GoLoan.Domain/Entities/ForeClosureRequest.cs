@@ -25,19 +25,15 @@ namespace GoLoan.Domain.Entities
 
         [Required]
         public string Reason { get; set; }
-
         public string Status { get; set; }
-
         public DateTime? ApprovedDate { get; set; }
 
         public bool IsPaid { get; set; } = false;
-
         public DateTime? PaidDate { get; set; }
         public string? RazorpayOrderId { get; set; }
 
         [ForeignKey("User")]
         public int? ClosedBy { get; set; }
-
         public LoanAccount? LoanAccount { get; set; }
     }
 }

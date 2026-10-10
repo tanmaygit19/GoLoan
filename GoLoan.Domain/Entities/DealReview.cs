@@ -13,11 +13,8 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("User")]
         public int OfficerId { get; set; }
-
         public string Status { get; set; }
-
         public LoanDeal? LoanDeal { get; set; }
-
         public User? User { get; set; }
     }
 }

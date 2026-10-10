@@ -280,6 +280,11 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<string>("RazorpayOrderId")
                         .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PartialAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -380,6 +385,9 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<DateTime>("DisbursementDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DisbursementId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("EmiAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -411,6 +419,8 @@ namespace GoLoan.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("DealId");
+
+                    b.HasIndex("DisbursementId");
 
                     b.ToTable("LoanAccounts");
                 });
@@ -911,6 +921,16 @@ namespace GoLoan.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+
+                    b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
+                        .WithMany()
+                        .HasForeignKey("DisbursementId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Disbursement");
 
                     b.Navigation("LoanDeal");
                 });

@@ -14,21 +14,18 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("Customer")]
         public int? CustomerId { get; set; }
-
         public string FirstName { get; set; }
-
         public string LastName { get; set; }
-
         public string Email { get; set; }
-
         public string Mobile { get; set; }
-
         public string Password { get; set; }
-
+        public bool IsTwoFaEnabled { get; set; } = true;
+        public bool IsEmailVerified { get; set; } = false;
+        public string? GoogleSubjectId { get; set; }
+        public string AuthProvider { get; set; } = "Local";
         public Role? Role { get; set; }
-
         public Customer? Customer { get; set; }
-
-        public ICollection<DealReview>? DealReviews { get; set; }
+        public List<DealReview>? DealReviews { get; set; }
+        public List<OtpRecord>? OtpRecords { get; set; }
     }
 }

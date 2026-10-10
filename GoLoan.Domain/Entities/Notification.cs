@@ -6,13 +6,9 @@ namespace GoLoan.Domain.Entities
     {
         [Key]
         public int NotificationId { get; set; }
-
         public int CustomerId { get; set; }
-
         public string Message { get; set; }
-
         public bool IsRead { get; set; } = false;
-
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
