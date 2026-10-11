@@ -31,9 +31,43 @@ namespace GoLoan.Infrastructure.Repositories
             await db.SaveChangesAsync();
         }
 
-        public Task<LoanAccountDTO> CreateLoanAccount(int id)
+
+        public async Task<LoanAccountDTO?> CreateLoanAccount(int id)
         {
-            throw new NotImplementedException();
+            var deal = await GetDeal(id);
+
+            if (deal == null)
+                return null;
+
+            if (await AccountExist(id))
+                return null;
+
+            var disbursement = deal.Disbursements?.FirstOrDefault(x =>x.Status == "Success" ||x.Status == "Completed");
+
+            if (disbursement == null)
+                return null;
+
+
+            var account = new LoanAccount
+            {
+                DealId = deal.DealId,
+                CustomerId = deal.CustomerId,
+                DisbursementId = disbursement.DisbursementId,
+                LoanAccountNo = "LA" +DateTime.Now.ToString("yyyyMMdd"),
+                LoanAmount = disbursement.DisburseAmount,
+                OutstandingPrincipal = disbursement.DisburseAmount,
+                LoanStatus = "Active",
+                InterestRate = Convert.ToDecimal(deal.InterestRate),
+                TenureMonths = deal.TenureMonths,
+                EmiAmount = deal.EmiAmount,
+                DisbursementDate = disbursement.DisbursementDate,
+                TotalPaidAmount = 0,
+                CreatedAt = DateTime.Now
+            };
+
+            await AddLoanAccount(account);
+
+            return mapper.Map<LoanAccountDTO>(account);
         }
 
         public async Task<List<LoanAccount>> GetAccounts()

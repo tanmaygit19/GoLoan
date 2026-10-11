@@ -12,6 +12,8 @@ namespace GoLoan.Application.Mapper
         public LoanAccountMapper()
         {
             CreateMap<LoanAccount, LoanAccountDTO>();
+            CreateMap<EmiSchedule, EmiSchedularDTO>();
+            CreateMap<EmiSchedularDTO, EmiSchedule>();
         }
     }
 }
