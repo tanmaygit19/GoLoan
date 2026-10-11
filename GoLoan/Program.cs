@@ -4,6 +4,7 @@ using GoLoan.Infrastructure.Data;
 using GoLoan.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -19,15 +20,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<ICustomerDashboardService, CustomerDashboardService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<ILMSReportsService, LMSReportsService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(LoanAccountMapper));
+builder.Services.AddAutoMapper(typeof(DashboardMappingProfile));
+builder.Services.AddAutoMapper(typeof(SupportTicketMappingProfile));
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
