@@ -89,6 +89,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("MonthlyIncome")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Pan")
@@ -147,6 +148,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("DisburseAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("DisbursementDate")
@@ -181,6 +183,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LoanAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("RejectionReason")
@@ -202,24 +205,28 @@ namespace GoLoan.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmiScheduleId"));
 
                     b.Property<decimal>("ClosingBalance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("Emi")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("InstallmentNo")
                         .HasColumnType("int");
 
                     b.Property<decimal>("InterestAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("LoanAccountId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("OpeningBalance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("PaidDate")
@@ -230,7 +237,11 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PrincipalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("RazorpayOrderId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EmiScheduleId");
 
@@ -257,6 +268,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("ForeClosureAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ForeClosureType")
@@ -269,10 +281,19 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<int>("LoanAccountId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NoOfEmi")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RazorpayOrderId")
+                        .HasColumnType("nvarchar(max)");
                     b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("PartialAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Reason")
@@ -308,6 +329,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("InterestAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("LoanAccountId")
@@ -373,11 +395,16 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<DateTime>("DisbursementDate")
                         .HasColumnType("datetime2");
+                        
+                    b.Property<int>("DisbursementId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("EmiAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("InterestRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LoanAccountNo")
@@ -385,6 +412,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LoanAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LoanStatus")
@@ -392,12 +420,14 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("OutstandingPrincipal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TenureMonths")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPaidAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("LoanAccountId");
@@ -405,6 +435,8 @@ namespace GoLoan.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("DealId");
+
+                    b.HasIndex("DisbursementId");
 
                     b.ToTable("LoanAccounts");
                 });
@@ -432,6 +464,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("FinalSettlementAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("LoanAccountId")
@@ -462,6 +495,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("ApprovedAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("BankAccountNumber")
@@ -480,6 +514,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("EmiAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmiDay")
@@ -493,6 +528,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("float");
 
                     b.Property<decimal>("LoanAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LoanType")
@@ -520,13 +556,18 @@ namespace GoLoan.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
 
+                    b.Property<int>("EmiScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("InterestPaid")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("LoanAccountId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("PaidAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("PaymentDate")
@@ -545,9 +586,11 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PenaltyPaid")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PrincipalPaid")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TransactionReference")
@@ -555,6 +598,8 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentId");
+
+                    b.HasIndex("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
 
@@ -587,6 +632,41 @@ namespace GoLoan.Infrastructure.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("GoLoan.Domain.Entities.OtpRecord", b =>
+                {
+                    b.Property<int>("OtpId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OtpId"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OtpId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OtpRecords");
+                });
+
             modelBuilder.Entity("GoLoan.Domain.Entities.PenaltyCharge", b =>
                 {
                     b.Property<int>("PenaltyId")
@@ -608,6 +688,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("PenaltyAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PenaltyType")
@@ -659,12 +740,14 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("EmiAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<double>("InterestRate")
                         .HasColumnType("float");
 
                     b.Property<decimal>("LoanAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LoanType")
@@ -693,6 +776,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("EligibleLoanAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("RiskCategory")
@@ -758,6 +842,10 @@ namespace GoLoan.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<string>("AuthProvider")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
@@ -768,6 +856,15 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoogleSubjectId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTwoFaEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -905,6 +1002,16 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Navigation("Customer");
 
+                    b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
+                        .WithMany()
+                        .HasForeignKey("DisbursementId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Disbursement");
+
                     b.Navigation("LoanDeal");
                 });
 
@@ -940,13 +1047,32 @@ namespace GoLoan.Infrastructure.Migrations
 
             modelBuilder.Entity("GoLoan.Domain.Entities.LoanPayment", b =>
                 {
+                    b.HasOne("GoLoan.Domain.Entities.EmiSchedule", "EmiSchedule")
+                        .WithMany()
+                        .HasForeignKey("EmiScheduleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("GoLoan.Domain.Entities.LoanAccount", "LoanAccount")
                         .WithMany()
                         .HasForeignKey("LoanAccountId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.Navigation("EmiSchedule");
+
                     b.Navigation("LoanAccount");
+                });
+
+            modelBuilder.Entity("GoLoan.Domain.Entities.OtpRecord", b =>
+                {
+                    b.HasOne("GoLoan.Domain.Entities.User", "User")
+                        .WithMany("OtpRecords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GoLoan.Domain.Entities.PenaltyCharge", b =>
@@ -1057,6 +1183,8 @@ namespace GoLoan.Infrastructure.Migrations
             modelBuilder.Entity("GoLoan.Domain.Entities.User", b =>
                 {
                     b.Navigation("DealReviews");
+
+                    b.Navigation("OtpRecords");
                 });
 #pragma warning restore 612, 618
         }

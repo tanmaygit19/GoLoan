@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "GoLoan.Application": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\USER\\source\\repos\\GoLoan\\GoLoan"
+    }
+  }
+}

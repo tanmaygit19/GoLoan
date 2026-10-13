@@ -56,10 +56,10 @@ namespace GoLoan.Domain.Entities
         ErrorMessage = "Enter valid income")]
         public decimal MonthlyIncome { get; set; }
         public bool IsEmailVerified { get; set; } = false;
-        public ICollection<KycDocument>? KycDocuments { get; set; }
-        public ICollection<CibilReport>? CibilReports { get; set; }
-        public ICollection<EligibilityResult>? EligibilityResults { get; set; }
-        public ICollection<ScoreCard>? ScoreCards { get; set; }
-        public ICollection<LoanDeal>? LoanDeals { get; set; }
+        public List<KycDocument>? KycDocuments { get; set; }
+        public List<CibilReport>? CibilReports { get; set; }
+        public List<EligibilityResult>? EligibilityResults { get; set; }
+        public List<ScoreCard>? ScoreCards { get; set; }
+        public List<LoanDeal>? LoanDeals { get; set; }
     }
 }
