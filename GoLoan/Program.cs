@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Hangfire;
+using GoLoan.Application;
 using GoLoan.Application.DTO.Auth;
 using GoLoan.Application.Interfaces;
 using GoLoan.Application.Interfaces.Auth;
@@ -8,6 +9,7 @@ using GoLoan.Application.Mapper;
 using GoLoan.Infrastructure.Data;
 using GoLoan.Infrastructure.Repositories;
 using GoLoan.Infrastructure.Repositories.Auth;
+using GoLoan.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -32,15 +34,16 @@ builder.Services.Configure<JwtSettingsDTO>(
 builder.Services.Configure<EmailSettingsDTO>(
     builder.Configuration.GetSection("EmailSettings"));
 
-// AutoMapper
-builder.Services.AddAutoMapper(
-    cfg => { },
-    AppDomain.CurrentDomain.GetAssemblies()
-        .Append(typeof(LoanAccountMapper).Assembly)
-        .Append(typeof(DashboardMappingProfile).Assembly)
-        .Append(typeof(SupportTicketMappingProfile).Assembly)
-        .Distinct()
-        .ToArray());
+// AutoMapper: register all assemblies used by either branch.
+var mapperAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+    .Append(typeof(LoanAccountMapper).Assembly)
+    .Append(typeof(DashboardMappingProfile).Assembly)
+    .Append(typeof(SupportTicketMappingProfile).Assembly)
+    .Append(typeof(MappingData).Assembly)
+    .Distinct()
+    .ToArray();
+
+builder.Services.AddAutoMapper(cfg => { }, mapperAssemblies);
 
 // JWT Authentication
 var jwtKey = builder.Configuration["JwtSettings:Key"];
@@ -58,13 +61,10 @@ builder.Services
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
-
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey!)),
-
             ClockSkew = TimeSpan.Zero
         };
 
@@ -90,7 +90,7 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
-// ForeClosure and payment services
+// Foreclosure and payment services
 builder.Services.AddScoped<IForeClosureService, ForeClosureService>();
 builder.Services.AddScoped<RazorpayService>();
 builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
@@ -108,6 +108,11 @@ builder.Services.AddScoped<ILoanAccountService, LoanAccountService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmiSchedular, EmiSchedular>();
 
+// Other loan services
+builder.Services.AddScoped<Isanctionletter, sanctionletterservice>();
+builder.Services.AddScoped<ILoanDealCreation, LoanDealCreation>();
+builder.Services.AddScoped<IDisbursement, DisbursementService>();
+
 // Hangfire
 builder.Services.AddHangfire(configuration =>
     configuration.UseSqlServerStorage(
@@ -115,10 +120,8 @@ builder.Services.AddHangfire(configuration =>
 
 builder.Services.AddHangfireServer();
 
-// API Explorer
+// API Explorer and Swagger with JWT authorization
 builder.Services.AddEndpointsApiExplorer();
-
-// Swagger with JWT authorization
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -165,7 +168,6 @@ app.Use(async (context, next) =>
             await next();
 
             buffer.Seek(0, SeekOrigin.Begin);
-
             var json = await new StreamReader(buffer).ReadToEndAsync();
 
             json = Regex.Replace(
@@ -174,10 +176,8 @@ app.Use(async (context, next) =>
                 "\"security\":[{\"Bearer\":[]}]");
 
             var bytes = Encoding.UTF8.GetBytes(json);
-
             context.Response.Body = originalBody;
             context.Response.ContentLength = bytes.Length;
-
             await originalBody.WriteAsync(bytes);
         }
         finally
@@ -191,7 +191,6 @@ app.Use(async (context, next) =>
     }
 });
 
-// Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -202,7 +201,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -210,7 +208,6 @@ app.UseAuthorization();
 app.UseHangfireDashboard();
 
 app.MapControllers();
-
 app.Run();
 
 // Swagger authorization operation filter
@@ -225,16 +222,14 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
                 .GetCustomAttributes(true)
                 .OfType<AuthorizeAttribute>()
                 .Any() == true
-            ||
-            context.MethodInfo
+            || context.MethodInfo
                 .GetCustomAttributes(true)
                 .OfType<AuthorizeAttribute>()
                 .Any();
 
         if (hasAuthorize)
         {
-            operation.Security ??=
-                new List<OpenApiSecurityRequirement>();
+            operation.Security ??= new List<OpenApiSecurityRequirement>();
 
             operation.Security.Add(
                 new OpenApiSecurityRequirement

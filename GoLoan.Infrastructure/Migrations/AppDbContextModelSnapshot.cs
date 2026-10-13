@@ -395,7 +395,7 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<DateTime>("DisbursementDate")
                         .HasColumnType("datetime2");
-
+                        
                     b.Property<int>("DisbursementId")
                         .HasColumnType("int");
 
@@ -749,6 +749,10 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<decimal>("LoanAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LoanType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TenureMonths")
                         .HasColumnType("int");
