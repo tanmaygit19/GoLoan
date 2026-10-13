@@ -240,6 +240,9 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("RazorpayOrderId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
@@ -278,6 +281,14 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<int>("LoanAccountId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NoOfEmi")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RazorpayOrderId")
+                        .HasColumnType("nvarchar(max)");
                     b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
 
@@ -545,6 +556,9 @@ namespace GoLoan.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
 
+                    b.Property<int>("EmiScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("InterestPaid")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -584,6 +598,8 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentId");
+
+                    b.HasIndex("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
 
@@ -980,6 +996,8 @@ namespace GoLoan.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.Navigation("Customer");
+
                     b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
                         .WithMany()
                         .HasForeignKey("DisbursementId")
@@ -1025,11 +1043,19 @@ namespace GoLoan.Infrastructure.Migrations
 
             modelBuilder.Entity("GoLoan.Domain.Entities.LoanPayment", b =>
                 {
+                    b.HasOne("GoLoan.Domain.Entities.EmiSchedule", "EmiSchedule")
+                        .WithMany()
+                        .HasForeignKey("EmiScheduleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("GoLoan.Domain.Entities.LoanAccount", "LoanAccount")
                         .WithMany()
                         .HasForeignKey("LoanAccountId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("EmiSchedule");
 
                     b.Navigation("LoanAccount");
                 });
