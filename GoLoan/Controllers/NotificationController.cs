@@ -28,12 +28,6 @@ namespace GoLoan.Controllers
             await service.MarkAsRead(notificationId, customerId);
             return Ok("Notification marked as read.");
         }
-        [HttpPost("TestEmiReminders")]
-        public async Task<IActionResult> TestEmiReminders()
-        {
-            await service.CreateEmiReminders();
-            return Ok("EMI reminders checked and created if due tomorrow.");
-        }
     }
 
 }

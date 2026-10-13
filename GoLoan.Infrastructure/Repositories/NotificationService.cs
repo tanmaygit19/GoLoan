@@ -33,12 +33,11 @@ namespace GoLoan.Infrastructure.Repositories
                 var message = $"Reminder: Your EMI of {emi.Emi:C} " +
                               $"is due on {emi.DueDate:dd MMM yyyy}.";
 
-                var alreadyExists = await db.Notifications.AnyAsync(n =>n.CustomerId == customerId & n.Message == message);
+                var alreadyExists = await db.Notifications.AnyAsync(n =>n.CustomerId == customerId && n.Message == message);
 
                 if (!alreadyExists)
                 {
-                    var notification =
-                        new GoLoan.Domain.Entities.Notification
+                    var notification = new Notification
                         {
                             CustomerId = customerId,
                             Message = message,
