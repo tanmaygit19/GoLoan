@@ -7,6 +7,7 @@ namespace GoLoan.Application.Interfaces.Auth
     {
         Task<AuthResponseDTO> Register(RegisterDTO dto);
         Task<AuthResponseDTO> Login(LoginDTO dto);
+        Task<AuthResponseDTO> GoogleLogin(GoogleLoginDTO dto);
         Task<User?> GetUserByEmail(string email);
         Task<User?> GetUserById(int userId);
         Task<UserProfileDTO?> GetUserProfileAsync(int userId);
