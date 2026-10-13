@@ -26,6 +26,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IForeClosureService, ForeClosureService>();
 builder.Services.AddScoped<RazorpayService>();
 builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
+builder.Services.AddScoped<ICustomerPaymentHistoryService, CustomerPaymentHistoryService>();
 
 builder.Services.AddHangfire(configuration =>
     configuration.UseSqlServerStorage(
@@ -44,6 +45,18 @@ builder.Services.AddScoped<IEmiSchedular, EmiSchedular>();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(LoanAccountMapper));
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyApp", Policy =>
+    {
+        Policy.WithOrigins("http://localhost:4200")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 var recurringJobManager =
@@ -68,6 +81,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseCors("MyApp");
 
 app.UseHangfireDashboard();
 app.MapControllers();

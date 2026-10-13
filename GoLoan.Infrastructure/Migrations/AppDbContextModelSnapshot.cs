@@ -280,11 +280,6 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<string>("RazorpayOrderId")
                         .HasColumnType("nvarchar(max)");
-                    b.Property<DateTime?>("PaidDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("PartialAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -608,6 +603,41 @@ namespace GoLoan.Infrastructure.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("GoLoan.Domain.Entities.OtpRecord", b =>
+                {
+                    b.Property<int>("OtpId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OtpId"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OtpId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OtpRecord");
+                });
+
             modelBuilder.Entity("GoLoan.Domain.Entities.PenaltyCharge", b =>
                 {
                     b.Property<int>("PenaltyId")
@@ -775,6 +805,10 @@ namespace GoLoan.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<string>("AuthProvider")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
@@ -785,6 +819,15 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoogleSubjectId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTwoFaEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -920,8 +963,6 @@ namespace GoLoan.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Customer");
-
                     b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
                         .WithMany()
                         .HasForeignKey("DisbursementId")
@@ -982,6 +1023,17 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Navigation("EmiSchedule");
 
                     b.Navigation("LoanAccount");
+                });
+
+            modelBuilder.Entity("GoLoan.Domain.Entities.OtpRecord", b =>
+                {
+                    b.HasOne("GoLoan.Domain.Entities.User", "User")
+                        .WithMany("OtpRecords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GoLoan.Domain.Entities.PenaltyCharge", b =>
@@ -1092,6 +1144,8 @@ namespace GoLoan.Infrastructure.Migrations
             modelBuilder.Entity("GoLoan.Domain.Entities.User", b =>
                 {
                     b.Navigation("DealReviews");
+
+                    b.Navigation("OtpRecords");
                 });
 #pragma warning restore 612, 618
         }

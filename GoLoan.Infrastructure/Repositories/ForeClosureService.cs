@@ -3,6 +3,7 @@ using GoLoan.Application.DTO;
 using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
 using GoLoan.Infrastructure.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -242,6 +243,23 @@ namespace GoLoan.Infrastructure.Repositories
             }
 
             await data.SaveChangesAsync();
+        }
+
+        public async Task<List<GetForeClosureRequestDto>> GetAllForeClosureRequests()
+        {
+
+             return await data.ForeClosureRequests.Include(x => x.LoanAccount)
+            .Select(x => new GetForeClosureRequestDto
+            {
+                LoanAccountNo = x.LoanAccount.LoanAccountNo,
+                Amount = x.ForeClosureAmount,
+                Type = x.ForeClosureType,
+                Reason = x.Reason,
+                Status = x.Status
+
+            }).ToListAsync();
+                 
+          
         }
     }
 }
