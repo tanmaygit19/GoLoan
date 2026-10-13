@@ -94,6 +94,40 @@ namespace GoLoan.Controllers
             });
         }
 
+        [HttpPost("GoogleLogin")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Validation failed", errors = ModelState });
+            }
+
+            var result = await _authService.GoogleLogin(dto);
+            if (!result.Success)
+            {
+                return Unauthorized(new { success = false, message = result.Message });
+            }
+
+            if (!string.IsNullOrEmpty(result.Token))
+            {
+                SetJwtCookie(result.Token);
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                token = result.Token,
+                tokenType = result.TokenType,
+                tokenExpiry = result.TokenExpiry,
+                userId = result.UserId,
+                fullName = result.FullName,
+                email = result.Email,
+                role = result.Role,
+                customerId = result.CustomerId
+            });
+        }
+
         [HttpPost("Setup2FA")]
         public async Task<IActionResult> Setup2FA(
             [FromBody] VerifyOtpDTO dto,

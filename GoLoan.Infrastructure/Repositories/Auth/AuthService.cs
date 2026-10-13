@@ -12,17 +12,20 @@ namespace GoLoan.Infrastructure.Repositories.Auth
         private readonly AppDbContext _db;
         private readonly IJwtService _jwtService;
         private readonly IOtpService _otpService;
+        private readonly IGoogleAuthService _googleAuthService;
         private readonly IMapper _mapper;
 
         public AuthService(
             AppDbContext db,
             IJwtService jwtService,
             IOtpService otpService,
+            IGoogleAuthService googleAuthService,
             IMapper mapper)
         {
             _db = db;
             _jwtService = jwtService;
             _otpService = otpService;
+            _googleAuthService = googleAuthService;
             _mapper = mapper;
         }
 
@@ -126,6 +129,92 @@ namespace GoLoan.Infrastructure.Repositories.Auth
                 Message = "Enter the 6-digit code from Google Authenticator",
                 RequiresTwoFactor = true,
                 PreAuthToken = preAuthToken
+            };
+        }
+
+        public async Task<AuthResponseDTO> GoogleLogin(GoogleLoginDTO dto)
+        {
+            var googleUser = await _googleAuthService.ValidateGoogleToken(dto.IdToken);
+            if (googleUser == null)
+            {
+                return new AuthResponseDTO
+                {
+                    Success = false,
+                    Message = "Invalid or expired Google token"
+                };
+            }
+
+            var user = await _db.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.GoogleSubjectId == googleUser.GoogleSubjectId || u.Email == googleUser.Email);
+
+            if (user == null)
+            {
+                // New user: find Customer role
+                var customerRole = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == "Customer")
+                                   ?? await _db.Roles.FirstOrDefaultAsync();
+
+                if (customerRole == null)
+                {
+                    return new AuthResponseDTO
+                    {
+                        Success = false,
+                        Message = "Default Customer role not found in database."
+                    };
+                }
+
+                user = new User
+                {
+                    FirstName = !string.IsNullOrWhiteSpace(googleUser.FirstName) ? googleUser.FirstName : "Google",
+                    LastName = !string.IsNullOrWhiteSpace(googleUser.LastName) ? googleUser.LastName : "User",
+                    Email = googleUser.Email,
+                    Mobile = "",
+                    Password = "",
+                    RoleId = customerRole.RoleId,
+                    Role = customerRole,
+                    IsTwoFaEnabled = false,
+                    IsEmailVerified = googleUser.EmailVerified,
+                    GoogleSubjectId = googleUser.GoogleSubjectId,
+                    AuthProvider = "Google"
+                };
+
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                bool updated = false;
+                if (string.IsNullOrEmpty(user.GoogleSubjectId))
+                {
+                    user.GoogleSubjectId = googleUser.GoogleSubjectId;
+                    updated = true;
+                }
+                if (!user.IsEmailVerified && googleUser.EmailVerified)
+                {
+                    user.IsEmailVerified = true;
+                    updated = true;
+                }
+                if (updated)
+                {
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            // Generate GoLoan JWT
+            var token = _jwtService.GenerateToken(user);
+
+            return new AuthResponseDTO
+            {
+                Success = true,
+                Message = "Google authentication successful",
+                Token = token,
+                TokenType = "Bearer",
+                TokenExpiry = DateTime.UtcNow.AddMinutes(60),
+                UserId = user.UserId,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Email = user.Email,
+                Role = user.Role?.RoleName ?? "Customer",
+                CustomerId = user.CustomerId
             };
         }
 
