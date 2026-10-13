@@ -10,6 +10,7 @@ using GoLoan.Infrastructure.Repositories;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -37,6 +38,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<ICustomerDashboardService, CustomerDashboardService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<ILMSReportsService, LMSReportsService>();
 builder.Services.AddScoped<ILoanAccountService, LoanAccountService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmiSchedular, EmiSchedular>();
@@ -44,6 +47,8 @@ builder.Services.AddScoped<IEmiSchedular, EmiSchedular>();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(LoanAccountMapper));
+builder.Services.AddAutoMapper(typeof(DashboardMappingProfile));
+builder.Services.AddAutoMapper(typeof(SupportTicketMappingProfile));
 
 var app = builder.Build();
 var recurringJobManager =
