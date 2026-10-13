@@ -289,8 +289,6 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<string>("RazorpayOrderId")
                         .HasColumnType("nvarchar(max)");
-                    b.Property<DateTime?>("PaidDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("PartialAmount")
                         .HasPrecision(18, 2)
@@ -663,7 +661,7 @@ namespace GoLoan.Infrastructure.Migrations
                     b.HasKey("OtpId");
 
                     b.HasIndex("UserId");
-
+                    
                     b.ToTable("OtpRecords");
                 });
 
@@ -999,8 +997,6 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasForeignKey("DealId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Customer");
 
                     b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
                         .WithMany()

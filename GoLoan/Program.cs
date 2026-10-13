@@ -94,6 +94,7 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IForeClosureService, ForeClosureService>();
 builder.Services.AddScoped<RazorpayService>();
 builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
+builder.Services.AddScoped<ICustomerPaymentHistoryService, CustomerPaymentHistoryService>();
 
 // Customer and support services
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
@@ -139,6 +140,18 @@ builder.Services.AddSwaggerGen(options =>
 
 // Built-in OpenAPI
 builder.Services.AddOpenApi();
+
+// Angular frontend CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -201,6 +214,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("MyApp");
 app.UseAuthentication();
 app.UseAuthorization();
 

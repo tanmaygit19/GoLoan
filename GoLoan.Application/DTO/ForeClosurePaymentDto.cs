@@ -7,11 +7,12 @@ namespace GoLoan.Application.DTO
     public class ForeClosurePaymentDto
     {
 
-        public int RequestId { get; set;}
-        public string PaymentMode { get; set; }
-        public string TransactionReference { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public decimal PaidAmount { get; set; }
+        public int RequestId { get; set; }
+        public int LoanAccountId { get; set; }
+        public string ForeClosureType { get; set; }
+        public decimal ForeClosureAmount { get; set; }
+        public string Status { get; set; }
+        public DateTime PaidDate { get; set; }
 
 
     }

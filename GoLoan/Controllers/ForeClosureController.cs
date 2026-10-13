@@ -36,6 +36,21 @@ namespace GoLoan.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetReq")]
+        public async Task<IActionResult> GetReq()
+        {
+            try
+            {
+                var data = await service.GetAllForeClosureRequests();
+                return Ok(data);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [HttpPut]
         [Route("Approve/{requestId}")]
