@@ -1,4 +1,5 @@
 ﻿using GoLoan.Application.Interfaces;
+using GoLoan.Infrastructure.Repositories;
 using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,13 @@ namespace GoLoan.Controllers
     {
         private readonly ILoanAccountService service;
         private readonly IBackgroundJobClient bj;
+      
 
         public LoanAccountController(ILoanAccountService service, IBackgroundJobClient bj)
         {
             this.service = service;
             this.bj = bj;
+            
         }
 
 
@@ -55,6 +58,7 @@ namespace GoLoan.Controllers
 
             return Ok(account);
         }
+   
 
     }
 }

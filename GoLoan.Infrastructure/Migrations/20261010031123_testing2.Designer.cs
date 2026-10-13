@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoLoan.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261009033118_test")]
-    partial class test
+    [Migration("20261010031123_testing2")]
+    partial class testing2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -669,6 +669,10 @@ namespace GoLoan.Infrastructure.Migrations
 
                     b.Property<decimal>("LoanAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LoanType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TenureMonths")
                         .HasColumnType("int");

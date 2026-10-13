@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GoLoan.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class add : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,7 +26,7 @@ namespace GoLoan.Infrastructure.Migrations
                     Pan = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AadhaarNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmploymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MonthlyIncome = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MonthlyIncome = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     IsEmailVerified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -93,7 +93,7 @@ namespace GoLoan.Infrastructure.Migrations
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     CibilScore = table.Column<int>(type: "int", nullable: false),
                     IsEligible = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -135,15 +135,15 @@ namespace GoLoan.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     LoanType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     InterestRate = table.Column<double>(type: "float", nullable: false),
                     TenureMonths = table.Column<int>(type: "int", nullable: false),
-                    EmiAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EmiAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IFSCCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmiDay = table.Column<int>(type: "int", nullable: false),
-                    ApprovedAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ApprovedAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CurrentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AppliedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -166,7 +166,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     RiskCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EligibleLoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    EligibleLoanAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -190,7 +190,11 @@ namespace GoLoan.Infrastructure.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Mobile = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsTwoFaEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    IsEmailVerified = table.Column<bool>(type: "bit", nullable: false),
+                    GoogleSubjectId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AuthProvider = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -214,7 +218,7 @@ namespace GoLoan.Infrastructure.Migrations
                     DisbursementId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DealId = table.Column<int>(type: "int", nullable: false),
-                    DisburseAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DisburseAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     BankPartner = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DisbursementDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -230,50 +234,16 @@ namespace GoLoan.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LoanAccounts",
-                columns: table => new
-                {
-                    LoanAccountId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DealId = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    LoanAccountNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    OutstandingPrincipal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LoanStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InterestRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TenureMonths = table.Column<int>(type: "int", nullable: false),
-                    EmiAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DisbursementDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LoanAccounts", x => x.LoanAccountId);
-                    table.ForeignKey(
-                        name: "FK_LoanAccounts_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerId");
-                    table.ForeignKey(
-                        name: "FK_LoanAccounts_LoanDeals_DealId",
-                        column: x => x.DealId,
-                        principalTable: "LoanDeals",
-                        principalColumn: "DealId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SanctionLetters",
                 columns: table => new
                 {
                     SanctionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DealId = table.Column<int>(type: "int", nullable: false),
-                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     InterestRate = table.Column<double>(type: "float", nullable: false),
                     TenureMonths = table.Column<int>(type: "int", nullable: false),
-                    EmiAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EmiAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -312,6 +282,69 @@ namespace GoLoan.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OtpRecords",
+                columns: table => new
+                {
+                    OtpId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    AttemptCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OtpRecords", x => x.OtpId);
+                    table.ForeignKey(
+                        name: "FK_OtpRecords_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LoanAccounts",
+                columns: table => new
+                {
+                    LoanAccountId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DealId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    LoanAccountNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LoanAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    OutstandingPrincipal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    LoanStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InterestRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TenureMonths = table.Column<int>(type: "int", nullable: false),
+                    EmiAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    DisbursementDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DisbursementId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoanAccounts", x => x.LoanAccountId);
+                    table.ForeignKey(
+                        name: "FK_LoanAccounts_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId");
+                    table.ForeignKey(
+                        name: "FK_LoanAccounts_Disbursements_DisbursementId",
+                        column: x => x.DisbursementId,
+                        principalTable: "Disbursements",
+                        principalColumn: "DisbursementId");
+                    table.ForeignKey(
+                        name: "FK_LoanAccounts_LoanDeals_DealId",
+                        column: x => x.DealId,
+                        principalTable: "LoanDeals",
+                        principalColumn: "DealId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmiSchedules",
                 columns: table => new
                 {
@@ -320,11 +353,11 @@ namespace GoLoan.Infrastructure.Migrations
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
                     InstallmentNo = table.Column<int>(type: "int", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Emi = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PrincipalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    InterestAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    OpeningBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ClosingBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Emi = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PrincipalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    InterestAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    OpeningBalance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ClosingBalance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -346,8 +379,8 @@ namespace GoLoan.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
                     ForeClosureType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ForeClosureAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PartialAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ForeClosureAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PartialAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     RequestedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpectedClosureDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -374,7 +407,7 @@ namespace GoLoan.Infrastructure.Migrations
                     AccrualId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
-                    InterestAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    InterestAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     AccrualDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     InstallmentNo = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -397,7 +430,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
                     ClosureType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FinalSettlementAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    FinalSettlementAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ClosureDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ClosedBy = table.Column<int>(type: "int", nullable: false),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -427,12 +460,12 @@ namespace GoLoan.Infrastructure.Migrations
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
                     PaymentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaidAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentMode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionReference = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PrincipalPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    InterestPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PenaltyPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PrincipalPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    InterestPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PenaltyPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -484,7 +517,7 @@ namespace GoLoan.Infrastructure.Migrations
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
                     EmiScheduleId = table.Column<int>(type: "int", nullable: false),
                     PenaltyType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PenaltyAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PenaltyAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     DelayDays = table.Column<int>(type: "int", nullable: false),
                     AppliedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -560,6 +593,11 @@ namespace GoLoan.Infrastructure.Migrations
                 column: "DealId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LoanAccounts_DisbursementId",
+                table: "LoanAccounts",
+                column: "DisbursementId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LoanClosures_ClosedBy",
                 table: "LoanClosures",
                 column: "ClosedBy");
@@ -578,6 +616,11 @@ namespace GoLoan.Infrastructure.Migrations
                 name: "IX_LoanPayments_LoanAccountId",
                 table: "LoanPayments",
                 column: "LoanAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OtpRecords_UserId",
+                table: "OtpRecords",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PenaltyCharges_EmiScheduleId",
@@ -630,9 +673,6 @@ namespace GoLoan.Infrastructure.Migrations
                 name: "DealReviews");
 
             migrationBuilder.DropTable(
-                name: "Disbursements");
-
-            migrationBuilder.DropTable(
                 name: "EligibilityResults");
 
             migrationBuilder.DropTable(
@@ -652,6 +692,9 @@ namespace GoLoan.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "OtpRecords");
 
             migrationBuilder.DropTable(
                 name: "PenaltyCharges");
@@ -676,6 +719,9 @@ namespace GoLoan.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "LoanAccounts");
+
+            migrationBuilder.DropTable(
+                name: "Disbursements");
 
             migrationBuilder.DropTable(
                 name: "LoanDeals");

@@ -1,14 +1,8 @@
-﻿using GoLoan.Application.DTO.SupportTicket;
+﻿using AutoMapper;
+using GoLoan.Application.DTO.SupportTicket;
 using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
 using GoLoan.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoLoan.Infrastructure.Repositories
@@ -16,14 +10,17 @@ namespace GoLoan.Infrastructure.Repositories
     public class SupportTicketService : ISupportTicketService
     {
         private readonly AppDbContext db;
+        private readonly IMapper mapper;
 
-        public SupportTicketService(AppDbContext db)
+        public SupportTicketService(AppDbContext db, IMapper mapper)
         {
             this.db = db;
+            this.mapper = mapper;
         }
+
         public async Task AddTicketAsync(AddSupportTicketDTO dto, int customerId)
         {
-            var loanAccount = db.LoanAccounts.FirstOrDefault(x => x.CustomerId == customerId && x.LoanStatus == "Active");
+            var loanAccount = await db.LoanAccounts.FirstOrDefaultAsync(x => x.CustomerId == customerId && x.LoanStatus == "Active");
 
             if (loanAccount == null)
             {
@@ -42,7 +39,6 @@ namespace GoLoan.Infrastructure.Repositories
                 }
 
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.Attachment.FileName);
-
                 var filePath = Path.Combine(folderPath, fileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -71,69 +67,33 @@ namespace GoLoan.Infrastructure.Repositories
 
         public async Task<List<SupportTicketListDTO>> GetAllTicketsAsync()
         {
-            var tickets = await db.SupportTickets
-                .Include(x => x.Customer)
-                .Include(x => x.LoanAccount)
-                .Select(x => new SupportTicketListDTO
-                {
-                    TicketId = x.TicketId,
-                    LoanAccountNo = x.LoanAccount.LoanAccountNo,
-                    CustomerName = x.Customer.FirstName + " " + x.Customer.LastName,
-                    Subject = x.Subject,
-                    Status = x.Status,
-                    CreatedDate = x.CreatedDate
-                })
-                .ToListAsync();
+            var tickets = await db.SupportTickets.Include(x => x.Customer).Include(x => x.LoanAccount).ToListAsync();
 
-            return tickets;
+            return mapper.Map<List<SupportTicketListDTO>>(tickets);
         }
 
         public async Task<List<SupportTicketDTO>> GetMyTicketsAsync(int customerId)
         {
-            var tickets = await db.SupportTickets
-                .Where(x => x.CustomerId == customerId)
-                .Select(x => new SupportTicketDTO
-                {
-                    TicketId = x.TicketId,
-                    Subject = x.Subject,
-                    Description = x.Description,
-                    AttachmentPath = x.AttachmentPath,
-                    CreatedDate = x.CreatedDate,
-                    Status = x.Status,
-                    OfficerResponse = x.OfficerResponse
-                })
-                .ToListAsync();
+            var tickets = await db.SupportTickets.Where(x => x.CustomerId == customerId).ToListAsync();
 
-            return tickets;
+            return mapper.Map<List<SupportTicketDTO>>(tickets);
         }
 
         public async Task<SupportTicketDetailsDTO?> GetTicketByIdAsync(int ticketId)
         {
-            var ticket = await db.SupportTickets
-                .Include(x => x.Customer)
-                .Include(x => x.LoanAccount)
-                .Where(x => x.TicketId == ticketId)
-                .Select(x => new SupportTicketDetailsDTO
-                {
-                    TicketId = x.TicketId,
-                    CustomerName = x.Customer.FirstName + " " + x.Customer.LastName,
-                    LoanAccountNo = x.LoanAccount.LoanAccountNo,
-                    Subject = x.Subject,
-                    Description = x.Description,
-                    AttachmentPath = x.AttachmentPath,
-                    CreatedDate = x.CreatedDate,
-                    Status = x.Status,
-                    OfficerResponse = x.OfficerResponse
-                })
-                .FirstOrDefaultAsync();
+            var ticket = await db.SupportTickets.Include(x => x.Customer).Include(x => x.LoanAccount).FirstOrDefaultAsync(x => x.TicketId == ticketId);
 
-            return ticket;
+            if (ticket == null)
+            {
+                return null;
+            }
+
+            return mapper.Map<SupportTicketDetailsDTO>(ticket);
         }
 
         public async Task UpdateTicketAsync(int ticketId, UpdateSupportTicketDTO dto)
         {
-            var ticket = await db.SupportTickets
-                .FirstOrDefaultAsync(x => x.TicketId == ticketId);
+            var ticket = await db.SupportTickets.FirstOrDefaultAsync(x => x.TicketId == ticketId);
 
             if (ticket == null)
             {
@@ -147,3 +107,4 @@ namespace GoLoan.Infrastructure.Repositories
         }
     }
 }
+

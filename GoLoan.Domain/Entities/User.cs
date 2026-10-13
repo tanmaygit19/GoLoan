@@ -21,6 +21,7 @@ namespace GoLoan.Domain.Entities
         public string Password { get; set; }
         public bool IsTwoFaEnabled { get; set; } = true;
         public bool IsEmailVerified { get; set; } = false;
+        public string? TwoFaSecret { get; set; }
         public string? GoogleSubjectId { get; set; }
         public string AuthProvider { get; set; } = "Local";
         public Role? Role { get; set; }
