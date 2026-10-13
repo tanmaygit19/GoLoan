@@ -10,13 +10,10 @@ namespace GoLoan.Application.Interfaces
     {
         Task<LoanDeal?> GetDeal(int id);
         Task<bool> AccountExist(int id);
-
         Task<List<LoanAccount>> GetAccounts();
-
         Task<LoanAccount?> GetById(int id);
-
         Task AddLoanAccount(LoanAccount acc);
-        Task<LoanAccountDTO> CreateLoanAccount(int dealId);
+        //Task<LoanAccountDTO> CreateLoanAccount(int dealId);
 
     }
 }
