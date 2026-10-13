@@ -15,6 +15,7 @@ namespace GoLoan.Application
             CreateMap<SanctionLetter, SanctionLetterDTO>();
             CreateMap<DisbursementDTO, Disbursement>();
             CreateMap<Disbursement, DisbursementDTO2>();
+            CreateMap<LoanDeal, LoanStatusDTO>();
         }
     }
 }

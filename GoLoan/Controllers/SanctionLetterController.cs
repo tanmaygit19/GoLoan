@@ -1,62 +1,86 @@
-﻿
-using GoLoan.Application.Interfaces;
+﻿using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoLoan.Controllers
 {
-    public class SanctionLetterController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SanctionLetterController : ControllerBase
     {
-        Isanctionletter service;
+        
 
-        public SanctionLetterController(Isanctionletter service)
-        {
-            this.service = service;
-        }
+       
+        
+            Isanctionletter service;
 
-        [HttpPost]
-        [Route("GenerateSanction")]
-        public IActionResult generatesanction(int loandealid)
-        {
-            var id = service.generatesanction(loandealid);
-
-            return Ok(new CommonResponse
+            public SanctionLetterController(Isanctionletter service)
             {
-                success = true,
-                error = false,
-                data = null,
-                message = "Sanction Generated Successfully"
-            });
-        }
+                this.service = service;
+            }
 
-        [HttpGet]
-        [Route("FetchSanction")]
-        public IActionResult fetchsanction()
-        {
-            var data = service.fetchsanction();
-
-            return Ok(new CommonResponse
+            [HttpPost]
+            [Route("GenerateSanction")]
+            public IActionResult generatesanction(int loandealid)
             {
-                success = true,
-                error = false,
-                data = data,
-                message = "Sanction Details Fetched Successfully"
-            });
-        }
+                var id = service.generatesanction(loandealid);
 
-        [HttpGet]
-        [Route("FetchSanctionById")]
-        public IActionResult fetchsanctionbyid(int sanctionid)
-        {
-            var data = service.fetchsanctionbyid(sanctionid);
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = null,
+                    message = "Sanction Generated Successfully"
+                });
+            }
 
-            return Ok(new CommonResponse
+            [HttpGet]
+            [Route("FetchSanction")]
+            public IActionResult fetchsanction()
             {
-                success = true,
-                error = false,
-                data = data,
-                message = "Sanction Details Fetched Successfully"
-            });
-        }
+                var data = service.fetchsanction();
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = data,
+                    message = "Sanction Details Fetched Successfully"
+                });
+            }
+
+            [HttpGet]
+            [Route("FetchSanctionById")]
+            public IActionResult fetchsanctionbyid(int sanctionid)
+            {
+                var data = service.fetchsanctionbyid(sanctionid);
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = data,
+                    message = "Sanction Details Fetched Successfully"
+                });
+            }
+
+            [HttpGet]
+            [Route("DownloadSanction/{sanctionid}")]
+            public IActionResult downloadsanction(int sanctionid)
+            {
+                var data = service.downloadsanction(sanctionid);
+
+                if (data == null)
+                {
+                    return NotFound("Sanction letter not found or loan is not approved");
+                }
+
+                return File(data, "application/pdf",
+                    "SanctionLetter_" + sanctionid + ".pdf");
+            }
+
+        
     }
 }
+

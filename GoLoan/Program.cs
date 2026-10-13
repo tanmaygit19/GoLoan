@@ -24,6 +24,7 @@ builder.Services.AddScoped<Isanctionletter, sanctionletterservice>();
 builder.Services.AddScoped<ILoanDealCreation, LoanDealCreation>();
 builder.Services.AddScoped<IDisbursement, DisbursementService>();
 
+
 builder.Services.AddAutoMapper(cfg =>
 {
 }, typeof(MappingData).Assembly);
@@ -42,6 +43,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
 
 app.MapControllers();
 

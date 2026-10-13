@@ -24,11 +24,17 @@ namespace GoLoan.Infrastructure.Repositories
         public void adddisbursement(DisbursementDTO dis)
         {
             var loan = db.LoanDeals.FirstOrDefault(x => x.DealId == dis.DealId);
-            var data = mapper.Map<Disbursement>(dis);
-            data.DisbursementDate = DateTime.Now;
-            data.Status = "Pending";
-            db.Disbursements.Add(data);
-            db.SaveChanges();
+            if (loan != null && loan.CurrentStatus == "Approved")
+            {
+                var data = mapper.Map<Disbursement>(dis);
+
+                data.DisbursementDate = DateTime.Now;
+                data.Status = "Pending";
+
+                db.Disbursements.Add(data);
+                db.SaveChanges();
+            }
+            
 
         }
 
@@ -50,6 +56,41 @@ namespace GoLoan.Infrastructure.Repositories
 
             return mdata;
         }
+
+        public void approvedisbursement(int disbursementid)
+        {
+            var data = db.Disbursements.FirstOrDefault(x => x.DisbursementId == disbursementid);
+
+            if (data != null && data.Status == "Pending")
+            {
+                data.Status = "Approved";
+                db.SaveChanges();
+            }
+        }
+
+        public void rejectdisbursement(int disbursementid)
+        {
+            var data = db.Disbursements
+                .FirstOrDefault(x => x.DisbursementId == disbursementid);
+
+            if (data != null && data.Status == "Pending")
+            {
+                data.Status = "Rejected";
+                db.SaveChanges();
+            }
+        }
+
+        public List<DisbursementDTO2> fetchdisbursementsbystatus(string status)
+        {
+            var data = db.Disbursements
+                .Where(x => x.Status == status)
+                .ToList();
+
+            var mdata = mapper.Map<List<DisbursementDTO2>>(data);
+
+            return mdata;
+        }
+
 
     }
 }

@@ -12,5 +12,12 @@ namespace GoLoan.Application.Interfaces
         List<DisbursementDTO2> fetchdisbursement();
 
         DisbursementDTO2 fetchdisbursementbyid(int id);
+
+        void approvedisbursement(int disbursementid);
+
+        void rejectdisbursement(int disbursementid);
+
+        List<DisbursementDTO2> fetchdisbursementsbystatus(string status);
+
     }
 }

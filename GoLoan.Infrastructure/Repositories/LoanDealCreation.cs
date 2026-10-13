@@ -24,7 +24,7 @@ namespace GoLoan.Infrastructure.Services
         public void addloan(ApplyLoanDTO app)
         {
             var apply = mapper.Map<LoanDeal>(app);
-
+            apply.CurrentStatus = "Pending";
             db.LoanDeals.Add(apply);
             db.SaveChanges();
         }
@@ -52,5 +52,43 @@ namespace GoLoan.Infrastructure.Services
             return null;
 
         }
+
+
+        public void approveloan(LoanApprovalDTO app)
+        {
+            var data = db.LoanDeals.FirstOrDefault(x => x.DealId == app.DealId);
+
+            if (data != null && data.CurrentStatus == "Pending")
+            {
+                data.ApprovedAmount = app.ApprovedAmount;
+                data.CurrentStatus = "Approved";
+
+                db.SaveChanges();
+            }
+        }
+
+        public void rejectloan(LoanApprovalDTO app)
+        {
+            var data = db.LoanDeals.FirstOrDefault(x => x.DealId == app.DealId);
+
+            if (data != null && data.CurrentStatus == "Pending")
+            {
+                data.CurrentStatus = "Rejected";
+                data.RejectionReason = app.RejectionReason;
+
+                db.SaveChanges();
+            }
+        }
+
+        public List<LoanStatusDTO> fetchloansbystatus(string status)
+        {
+            var data = db.LoanDeals.Where(x =>x.CurrentStatus == status).ToList();
+
+            var mdata = mapper.Map<List<LoanStatusDTO>>(data);
+
+            return mdata;
+        }
+
+
     }
 }

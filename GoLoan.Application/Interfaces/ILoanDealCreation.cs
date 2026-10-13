@@ -13,5 +13,10 @@ namespace GoLoan.Application.Interfaces
         List<ApplyLoanDTO> fetchdetails();
 
         ApplyLoanDTO? fetchloanbyid(int customerid);
+
+        void approveloan(LoanApprovalDTO app);
+        void rejectloan(LoanApprovalDTO app);
+        List<LoanStatusDTO> fetchloansbystatus(string status);
+
     }
 }

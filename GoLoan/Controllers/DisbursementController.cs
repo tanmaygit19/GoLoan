@@ -1,69 +1,118 @@
 ﻿using GoLoan.Application.DTO;
 using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoLoan.Controllers
 {
-    public class DisbursementController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class DisbursementController : ControllerBase
     {
-        IDisbursement service;
 
-        public DisbursementController(IDisbursement disbursement)
-        {
-            this.service = disbursement;
-        }
+            IDisbursement service;
 
-
-        [HttpPost]
-        [Route("AddDisbursement")]
-        public IActionResult adddisbursement(DisbursementDTO dis)
-        {
-            service.adddisbursement(dis);
-
-            return Ok(new CommonResponse
+            public DisbursementController(IDisbursement disbursement)
             {
-                success = true,
-                error = false,
-                data = null,
-                message = "Disbursement Added Successfully"
-            });
-        }
+                this.service = disbursement;
+            }
 
-        [HttpGet]
-        [Route("FetchDisbursement")]
-        public IActionResult fetchdisbursement()
-        {
-            var data = service.fetchdisbursement();
 
-            return Ok(new CommonResponse
+            [HttpPost]
+            [Route("AddDisbursement")]
+            public IActionResult adddisbursement(DisbursementDTO dis)
             {
-                success = true,
-                error = false,
-                data = data,
-                message = "Disbursement Added Successfully"
-            });
-        }
+                service.adddisbursement(dis);
 
-        [HttpGet]
-        [Route("FetchDisbursementById")]
-        public IActionResult fetchdisbursementbyid(int id)
-        {
-            var data = service.fetchdisbursementbyid(id);
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = null,
+                    message = "Disbursement Added Successfully"
+                });
+            }
 
-            return Ok(new CommonResponse
+            [HttpGet]
+            [Route("FetchDisbursement")]
+            public IActionResult fetchdisbursement()
             {
-                success = true,
-                error = false,
-                data = data,
-                message = "Disbursement Fetched Successfully"
-            });
-        }
+                var data = service.fetchdisbursement();
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = data,
+                    message = "Disbursement Added Successfully"
+                });
+            }
+
+            [HttpGet]
+            [Route("FetchDisbursementById")]
+            public IActionResult fetchdisbursementbyid(int id)
+            {
+                var data = service.fetchdisbursementbyid(id);
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = data,
+                    message = "Disbursement Fetched Successfully"
+                });
+            }
+
+            [HttpPut]
+            [Route("ApproveDisbursement")]
+            public IActionResult approvedisbursement(int disbursementid)
+            {
+                service.approvedisbursement(disbursementid);
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = null,
+                    message = "Disbursement Approved Successfully"
+                });
+            }
+
+            [HttpPut]
+            [Route("RejectDisbursement")]
+            public IActionResult rejectdisbursement(int disbursementid)
+            {
+                service.rejectdisbursement(disbursementid);
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = null,
+                    message = "Disbursement Rejected Successfully"
+                });
+            }
+
+            [HttpGet]
+            [Route("FetchDisbursementsByStatus")]
+            public IActionResult fetchdisbursementsbystatus(string status)
+            {
+                var data = service.fetchdisbursementsbystatus(status);
+
+                return Ok(new CommonResponse
+                {
+                    success = true,
+                    error = false,
+                    data = data,
+                    message = "Disbursements Fetched Successfully"
+                });
+            }
 
 
-        public IActionResult Index()
-        {
-            return View();
+
+            
         }
     }
-}
+
+
