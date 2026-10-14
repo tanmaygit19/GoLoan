@@ -15,18 +15,14 @@ namespace GoLoan.Domain.Entities
         public decimal Emi { get; set; }
         public decimal PrincipalAmount { get; set; }
         public decimal InterestAmount { get; set; }
-
         public decimal OpeningBalance { get; set; }
-
         public decimal ClosingBalance { get; set; }
-
         public string PaymentStatus { get; set; }
-
         public DateTime? PaidDate { get; set; }
-
         public LoanAccount? LoanAccount { get; set; }
+        public string? RazorpayOrderId { get; set; }
 
-        
+
     }
 }
 
