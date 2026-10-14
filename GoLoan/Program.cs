@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Hangfire;
+using GoLoan.Exceptions;
 using GoLoan.Application;
 using GoLoan.Application.DTO.Auth;
 using GoLoan.Application.Interfaces;
@@ -142,6 +143,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseGlobalExceptionMiddleware();
 
 var recurringJobManager =
     app.Services.GetRequiredService<IRecurringJobManager>();
