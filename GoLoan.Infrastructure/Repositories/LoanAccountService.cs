@@ -72,12 +72,13 @@ namespace GoLoan.Infrastructure.Repositories
 
         public async Task<List<LoanAccount>> GetAccounts()
         {
-            return await db.LoanAccounts.ToListAsync();
+            return await db.LoanAccounts.Include(x => x.Customer)
+        .ToListAsync();
         }
 
         public async Task<LoanAccount?> GetById(int id)
         {
-            return await  db.LoanAccounts.FirstOrDefaultAsync(x => x.LoanAccountId == id);
+            return await  db.LoanAccounts.Include(x => x.Customer).FirstOrDefaultAsync(x => x.LoanAccountId == id);
         }
 
         public async Task<LoanDeal?> GetDeal(int id)

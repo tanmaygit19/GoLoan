@@ -22,7 +22,7 @@ builder.Services.AddHangfire(configuration =>
     ));
 builder.Services.AddHangfireServer();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<ICustomerDashboardService, CustomerDashboardService>();
@@ -33,6 +33,16 @@ builder.Services.AddScoped<IEmiSchedular, EmiSchedular>();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(LoanAccountMapper));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("myapp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+         .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 var recurringJobManager =
@@ -55,7 +65,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("myapp");
 app.UseAuthorization();
 
 
