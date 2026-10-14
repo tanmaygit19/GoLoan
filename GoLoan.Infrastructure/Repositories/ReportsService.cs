@@ -45,7 +45,7 @@ namespace GoLoan.Infrastructure.Repositories
                 .ToList();
 
             var cibilReports = await db.CibilReports
-                .Where(x => customerIds.Contains(x.CustomerId))
+                .Where(x => customerIds.Contains(x.customerId))
                 .ToListAsync();
 
             var scoreCards = await db.ScoreCards
@@ -54,7 +54,6 @@ namespace GoLoan.Infrastructure.Repositories
 
             var dashboard = new ReportsDashboardDTO();
 
-            // 1. Summary
             dashboard.Summary.TotalApplications = applications.Count;
 
             dashboard.Summary.ApplicationsApproved =
@@ -69,7 +68,6 @@ namespace GoLoan.Infrastructure.Repositories
                     x.CurrentStatus == "In Progress" ||
                     x.CurrentStatus == "Under Review");
 
-            // 2. Application Funnel
             dashboard.ApplicationFunnel = new List<ApplicationFunnelDTO>
             {
                 new ApplicationFunnelDTO
@@ -99,19 +97,18 @@ namespace GoLoan.Infrastructure.Repositories
                 }
             };
 
-            // 3. CIBIL Score Range Report
             var cibilGroups = cibilReports
                 .GroupBy(x =>
-                    x.CibilScore >= 750 ? "750 - 900" :
-                    x.CibilScore >= 650 ? "650 - 749" :
-                    x.CibilScore >= 550 ? "550 - 649" :
+                    x.cibilScore >= 750 ? "750 - 900" :
+                    x.cibilScore >= 650 ? "650 - 749" :
+                    x.cibilScore >= 550 ? "550 - 649" :
                     "300 - 549")
                 .ToList();
 
             foreach (var group in cibilGroups)
             {
                 var groupCustomerIds = group
-                    .Select(x => x.CustomerId)
+                    .Select(x => x.customerId)
                     .Distinct()
                     .ToList();
 
@@ -135,7 +132,6 @@ namespace GoLoan.Infrastructure.Repositories
                 });
             }
 
-            // 4. Score Card Wise Report
             var scoreCardGroups = scoreCards
                 .GroupBy(x => x.RiskCategory)
                 .ToList();
@@ -177,7 +173,6 @@ namespace GoLoan.Infrastructure.Repositories
                 });
             }
 
-            // 5. Product Wise Report
             var productGroups = applications
                 .GroupBy(x => x.LoanType)
                 .ToList();
