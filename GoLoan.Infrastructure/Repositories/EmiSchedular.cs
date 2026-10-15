@@ -22,33 +22,8 @@ namespace GoLoan.Infrastructure.Repositories
             this.mapper = mapper;
         }
 
-        public async  Task ForeClosureEmiPayment(int loanAccountId, int numberOfEmis)
-        {
-          if (numberOfEmis <= 0)
-                return;
-
-            var emis = await db.EmiSchedules
-                .Where(e => e.LoanAccountId == loanAccountId
-                            && e.PaymentStatus == "Pending")
-             .OrderBy(e => e.InstallmentNo)
-                .Take(numberOfEmis)
-                .ToListAsync();
-
-            if (emis.Count < numberOfEmis)
-                return;
-
-            foreach (var emi in emis)
-            {
-                emi.PaymentStatus = "Paid";
-                emi.PaidDate = DateTime.Now;
-            }
-
-            await db.SaveChangesAsync();
-        }
-        
-        
-
-        public async Task GenerateEmiSchedule(int loanAccountId)
+      
+         public async Task GenerateEmiSchedule(int loanAccountId)
         {
            var account = await db.LoanAccounts.FirstOrDefaultAsync(x => x.LoanAccountId == loanAccountId);
 

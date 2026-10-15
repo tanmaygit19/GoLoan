@@ -22,12 +22,30 @@ namespace GoLoan.Controllers
         [Route("GetEmiSchedule/{loanAccountId}")]
         public async Task<IActionResult> GetEmiSchedule(int loanAccountId)
         {
+
             var emis = await db.EmiSchedules
                 .Where(e => e.LoanAccountId == loanAccountId)
                 .OrderBy(e => e.InstallmentNo)
+                .Select(e => new
+                {
+                    e.EmiScheduleId,
+                    e.LoanAccountId,
+                    e.InstallmentNo,
+                    e.DueDate,
+                    e.Emi,
+                    e.PrincipalAmount,
+                    e.InterestAmount,
+                    e.OpeningBalance,
+                    e.ClosingBalance,
+                    e.PaymentStatus,
+                    e.PaidDate
+                })
                 .ToListAsync();
 
             return Ok(emis);
+
+
+           
         }
     }
 }

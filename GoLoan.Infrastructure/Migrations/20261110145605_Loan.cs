@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GoLoan.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class add : Migration
+    public partial class Loan : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

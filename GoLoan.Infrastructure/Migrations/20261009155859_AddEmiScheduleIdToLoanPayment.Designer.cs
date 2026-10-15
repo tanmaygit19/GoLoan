@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoLoan.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261008173138_add")]
-    partial class add
+    [Migration("20261009155859_AddEmiScheduleIdToLoanPayment")]
+    partial class AddEmiScheduleIdToLoanPayment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -272,11 +272,14 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<int>("LoanAccountId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NoOfEmi")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("PartialAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("RazorpayOrderId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -523,6 +526,9 @@ namespace GoLoan.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
 
+                    b.Property<int>("EmiScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("InterestPaid")
                         .HasColumnType("decimal(18,2)");
 
@@ -558,6 +564,8 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentId");
+
+                    b.HasIndex("EmiScheduleId");
 
                     b.HasIndex("LoanAccountId");
 
@@ -939,11 +947,19 @@ namespace GoLoan.Infrastructure.Migrations
 
             modelBuilder.Entity("GoLoan.Domain.Entities.LoanPayment", b =>
                 {
+                    b.HasOne("GoLoan.Domain.Entities.EmiSchedule", "EmiSchedule")
+                        .WithMany()
+                        .HasForeignKey("EmiScheduleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("GoLoan.Domain.Entities.LoanAccount", "LoanAccount")
                         .WithMany()
                         .HasForeignKey("LoanAccountId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("EmiSchedule");
 
                     b.Navigation("LoanAccount");
                 });

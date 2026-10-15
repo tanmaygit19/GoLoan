@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoLoan.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261009044317_test1")]
-    partial class test1
+    [Migration("20261110145605_Loan")]
+    partial class Loan
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -377,9 +377,6 @@ namespace GoLoan.Infrastructure.Migrations
                     b.Property<DateTime>("DisbursementDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DisbursementId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("EmiAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -411,8 +408,6 @@ namespace GoLoan.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("DealId");
-
-                    b.HasIndex("DisbursementId");
 
                     b.ToTable("LoanAccounts");
                 });
@@ -907,15 +902,7 @@ namespace GoLoan.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("GoLoan.Domain.Entities.Disbursement", "Disbursement")
-                        .WithMany()
-                        .HasForeignKey("DisbursementId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Disbursement");
 
                     b.Navigation("LoanDeal");
                 });
