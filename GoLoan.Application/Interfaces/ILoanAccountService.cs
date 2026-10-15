@@ -14,6 +14,9 @@ namespace GoLoan.Application.Interfaces
         Task<LoanAccount?> GetById(int id);
         Task AddLoanAccount(LoanAccount acc);
         Task<LoanAccountDTO?> CreateLoanAccount(int id);
+        Task<(List<LoanAccount> Accounts, int TotalCount)> GetAccountsPaged(int pageNumber, int pageSize);
+
+
 
     }
 }

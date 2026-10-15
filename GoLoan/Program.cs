@@ -149,16 +149,28 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+// Angular frontend CORS policy
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("MyApp", policy =>
+//    {
+//        policy.WithOrigins("http://localhost:4200")
+//            .AllowAnyMethod()
+//            .AllowAnyHeader()
+//            .AllowCredentials();
+//    });
+//});
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(cfg => { },typeof(LoanAccountMapper).Assembly
-); builder.Services.AddCors(options =>
+);
+builder.Services.AddCors(options =>
 {
     options.AddPolicy("myapp", policy =>
     {
         policy.WithOrigins("http://localhost:4200")
-         .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -223,9 +235,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("MyApp");
-app.UseAuthentication();
+//app.UseCors("MyApp");
 app.UseCors("myapp");
+app.UseAuthentication();
+
 app.UseAuthorization();
 app.UseHangfireDashboard();
 app.MapControllers();

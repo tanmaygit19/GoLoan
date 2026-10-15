@@ -15,10 +15,12 @@ namespace GoLoan.Infrastructure.Repositories
     {
         AppDbContext data;
         RazorpayService razorpayService;
-        public ForeClosureService(AppDbContext data, RazorpayService razorpayService)
+        private readonly IEmiSchedular emiSchedular;
+        public ForeClosureService(AppDbContext data, RazorpayService razorpayService, IEmiSchedular emiSchedular)
         {
             this.data = data;
             this.razorpayService = razorpayService;
+            this.emiSchedular = emiSchedular;
         }
 
 
@@ -240,6 +242,23 @@ namespace GoLoan.Infrastructure.Repositories
 
                 loanAccount.LoanStatus = "Closed";
                 loanAccount.OutstandingPrincipal = 0;
+            }
+            else if (request.ForeClosureType == "Partial")
+            {
+                var loanAccount = await data.LoanAccounts
+                    .FirstOrDefaultAsync(x =>
+                        x.LoanAccountId == request.LoanAccountId);
+
+                if (loanAccount == null)
+                    throw new Exception("Loan Account Not Found");
+
+                if (request.ForeClosureAmount > loanAccount.OutstandingPrincipal)
+                    throw new Exception("Foreclosure amount exceeds outstanding principal");
+
+                loanAccount.OutstandingPrincipal -= request.ForeClosureAmount;
+
+                await emiSchedular.RegenerateEmiScheduleAfterPartialForeclosure(
+                    loanAccount.LoanAccountId);
             }
 
             await data.SaveChangesAsync();
