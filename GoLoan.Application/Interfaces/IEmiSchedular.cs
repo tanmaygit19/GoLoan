@@ -7,6 +7,9 @@ namespace GoLoan.Application.Interfaces
     public interface IEmiSchedular
     {
         Task GenerateEmiSchedule(int loanAccountId);
-        Task ForeClosureEmiPayment(int loanAccountId, int numberOfEmis);
+
+        Task RegenerateEmiScheduleAfterPartialForeclosure(int loanAccountId);
+
+
     }
 }

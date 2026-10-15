@@ -22,33 +22,8 @@ namespace GoLoan.Infrastructure.Repositories
             this.mapper = mapper;
         }
 
-        public async  Task ForeClosureEmiPayment(int loanAccountId, int numberOfEmis)
-        {
-          if (numberOfEmis <= 0)
-                return;
-
-            var emis = await db.EmiSchedules
-                .Where(e => e.LoanAccountId == loanAccountId
-                            && e.PaymentStatus == "Pending")
-             .OrderBy(e => e.InstallmentNo)
-                .Take(numberOfEmis)
-                .ToListAsync();
-
-            if (emis.Count < numberOfEmis)
-                return;
-
-            foreach (var emi in emis)
-            {
-                emi.PaymentStatus = "Paid";
-                emi.PaidDate = DateTime.Now;
-            }
-
-            await db.SaveChangesAsync();
-        }
-        
-        
-
-        public async Task GenerateEmiSchedule(int loanAccountId)
+      
+         public async Task GenerateEmiSchedule(int loanAccountId)
         {
            var account = await db.LoanAccounts.FirstOrDefaultAsync(x => x.LoanAccountId == loanAccountId);
 
@@ -95,5 +70,61 @@ namespace GoLoan.Infrastructure.Repositories
 
                 await db.SaveChangesAsync();
             }
+
+        public async Task RegenerateEmiScheduleAfterPartialForeclosure(int loanAccountId)
+        {
+            var account = await db.LoanAccounts
+                .FirstOrDefaultAsync(x => x.LoanAccountId == loanAccountId);
+
+            if (account == null || account.LoanStatus == "Closed")
+                throw new Exception("Active loan account not found.");
+
+            var pendingEmis = await db.EmiSchedules
+                .Where(x => x.LoanAccountId == loanAccountId &&
+                            x.PaymentStatus == "Pending")
+                .OrderBy(x => x.InstallmentNo)
+                .ToListAsync();
+
+            if (!pendingEmis.Any())
+                return;
+
+            var nextDueDate = pendingEmis.First().DueDate;
+            int nextInstallment = pendingEmis.First().InstallmentNo;
+
+            db.EmiSchedules.RemoveRange(pendingEmis);
+
+            decimal balance = account.OutstandingPrincipal;
+            decimal rate = account.InterestRate / 1200m;
+
+            while (balance > 0)
+            {
+                decimal interest = Math.Round(balance * rate, 2);
+                decimal principal = Math.Min(account.EmiAmount - interest, balance);
+
+                if (principal <= 0)
+                    throw new Exception("EMI amount must exceed monthly interest.");
+
+                decimal openingBalance = balance;
+                balance -= principal;
+
+                db.EmiSchedules.Add(new EmiSchedule
+                {
+                    LoanAccountId = loanAccountId,
+                    InstallmentNo = nextInstallment++,
+                    DueDate = nextDueDate,
+                    Emi = principal + interest,
+                    PrincipalAmount = principal,
+                    InterestAmount = interest,
+                    OpeningBalance = openingBalance,
+                    ClosingBalance = balance,
+                    PaymentStatus = "Pending"
+                });
+
+                nextDueDate = nextDueDate.AddMonths(1);
+            }
+
+            await db.SaveChangesAsync();
         }
+
     }
+}
