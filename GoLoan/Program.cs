@@ -29,6 +29,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.Configure<JwtSettingsDTO>(
     builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddHangfire(configuration =>
+    configuration.UseSqlServerStorage(
+        builder.Configuration.GetConnectionString("dbconn")
+    ));
+builder.Services.AddHangfireServer();
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<EmailSettingsDTO>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -90,6 +96,8 @@ builder.Services.AddScoped<RazorpayService>();
 builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
 builder.Services.AddScoped<ICustomerPaymentHistoryService, CustomerPaymentHistoryService>();
 
+// Customer and support services
+
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<ICustomerDashboardService, CustomerDashboardService>();
 
@@ -139,6 +147,18 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
+    });
+});
+builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(cfg => { },typeof(LoanAccountMapper).Assembly
+); builder.Services.AddCors(options =>
+{
+    options.AddPolicy("myapp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+         .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
@@ -205,6 +225,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("MyApp");
 app.UseAuthentication();
+app.UseCors("myapp");
 app.UseAuthorization();
 app.UseHangfireDashboard();
 app.MapControllers();
