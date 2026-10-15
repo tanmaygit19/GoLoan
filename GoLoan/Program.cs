@@ -235,11 +235,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.UseCors("MyApp");
-app.UseCors("myapp");
+app.UseStaticFiles();
+app.UseCors("MyApp");
 app.UseAuthentication();
-
-app.UseAuthorization();
 app.UseHangfireDashboard();
 app.MapControllers();
 
