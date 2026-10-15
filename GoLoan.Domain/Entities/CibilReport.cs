@@ -9,13 +9,18 @@ namespace GoLoan.Domain.Entities
     public class CibilReport
     {
         [Key]
-        public int CibilReportId { get; set; }
+        public int cibilReportId { get; set; }
 
-        [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
-        public string PanNo { get; set; }
-        public int CibilScore { get; set; }
-        public DateTime CheckDate { get; set; }
-        public Customer? Customer { get; set; }
+        [ForeignKey("customers")]
+        public int customerId { get; set; }
+        public Customer customers { get; set; }
+
+        public string panNo { get; set; }
+
+        public int cibilScore { get; set; }
+
+        public DateTime checkDate { get; set; }
     }
 }
+
+    
