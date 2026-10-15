@@ -10,8 +10,10 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
+        public Customer? Customer { get; set; }
+
         public string RiskCategory { get; set; }
         public decimal EligibleLoanAmount { get; set; }
-        public Customer? Customer { get; set; }
+        
     }
 }
