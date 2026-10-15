@@ -76,6 +76,20 @@ namespace GoLoan.Infrastructure.Repositories
         .ToListAsync();
         }
 
+        public async Task<(List<LoanAccount> Accounts, int TotalCount)> GetAccountsPaged(int pageNumber, int pageSize)
+        {
+            var totalCount = await db.LoanAccounts.CountAsync();
+
+            var accounts = await db.LoanAccounts
+                .Include(x => x.Customer)
+                .OrderBy(x => x.LoanAccountId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (accounts, totalCount);
+        }
+
         public async Task<LoanAccount?> GetById(int id)
         {
             return await  db.LoanAccounts.Include(x => x.Customer).FirstOrDefaultAsync(x => x.LoanAccountId == id);

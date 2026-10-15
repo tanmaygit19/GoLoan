@@ -58,7 +58,20 @@ namespace GoLoan.Controllers
 
             return Ok(account);
         }
-   
+
+
+        [HttpGet]
+        [Route("GetAccountsPagination")]
+        public async Task<IActionResult> GetAccountsPagination(
+            int pagenumber = 1,
+            int pagesize = 5)
+        {
+            var result = await service.GetAccountsPaged(pagenumber, pagesize);
+
+            return Ok(result.Accounts);
+        }
+
+
 
     }
 }
