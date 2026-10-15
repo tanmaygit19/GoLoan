@@ -203,6 +203,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("MyApp");
 app.UseAuthentication();
 app.UseAuthorization();

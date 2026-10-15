@@ -53,9 +53,46 @@ namespace GoLoan.Infrastructure.Repositories.Auth
                 };
             }
 
-            var user = _mapper.Map<User>(dto);
+            int? linkedCustomerId = null;
+            if (dto.RoleId == 1)
+            {
+                var existingCustomer = await _db.Customers
+                    .FirstOrDefaultAsync(c => c.Email == dto.Email || (dto.Pan != null && c.Pan == dto.Pan));
 
+                if (existingCustomer != null)
+                {
+                    return new AuthResponseDTO
+                    {
+                        Success = false,
+                        Message = "A customer profile with this email or PAN already exists"
+                    };
+                }
+
+                var customer = new Customer
+                {
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    Age = dto.Age ?? 25,
+                    Email = dto.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                    MobileNo = dto.Mobile,
+                    Pan = dto.Pan ?? "ABCDE1234F",
+                    AadhaarNo = dto.AadhaarNo ?? "123456789012",
+                    EmploymentType = dto.EmploymentType ?? "Salaried",
+                    MonthlyIncome = dto.MonthlyIncome ?? 50000,
+                    MonthlyInvestment = dto.MonthlyInvestment ?? 0,
+                    IsEmailVerified = false
+                };
+
+                _db.Customers.Add(customer);
+                await _db.SaveChangesAsync();
+
+                linkedCustomerId = customer.CustomerId;
+            }
+
+            var user = _mapper.Map<User>(dto);
             user.Password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            user.CustomerId = linkedCustomerId;
             user.IsTwoFaEnabled = false;
             user.IsEmailVerified = false;
             user.TwoFaSecret = null;
@@ -67,9 +104,12 @@ namespace GoLoan.Infrastructure.Repositories.Auth
             return new AuthResponseDTO
             {
                 Success = true,
-                Message = "Registration successful. Please login to continue."
+                Message = "Registration successful. Please login to continue.",
+                CustomerId = linkedCustomerId,
+                UserId = user.UserId
             };
         }
+
 
         public async Task<AuthResponseDTO> Login(LoginDTO dto)
         {
@@ -150,7 +190,6 @@ namespace GoLoan.Infrastructure.Repositories.Auth
 
             if (user == null)
             {
-                // New user: find Customer role
                 var customerRole = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == "Customer")
                                    ?? await _db.Roles.FirstOrDefaultAsync();
 
@@ -163,15 +202,45 @@ namespace GoLoan.Infrastructure.Repositories.Auth
                     };
                 }
 
+                var existingCustomer = await _db.Customers.FirstOrDefaultAsync(c => c.Email == googleUser.Email);
+                int? linkedCustomerId = null;
+
+                if (existingCustomer != null)
+                {
+                    linkedCustomerId = existingCustomer.CustomerId;
+                }
+                else if (customerRole.RoleId == 1 || customerRole.RoleName == "Customer")
+                {
+                    var newCustomer = new Customer
+                    {
+                        FirstName = !string.IsNullOrWhiteSpace(googleUser.FirstName) ? googleUser.FirstName : "Google",
+                        LastName = !string.IsNullOrWhiteSpace(googleUser.LastName) ? googleUser.LastName : "User",
+                        Age = 25,
+                        Email = googleUser.Email,
+                        Password = "",
+                        MobileNo = "9876543210",
+                        Pan = "ABCDE1234F",
+                        AadhaarNo = "123456789012",
+                        EmploymentType = "Salaried",
+                        MonthlyIncome = 50000,
+                        MonthlyInvestment = 0,
+                        IsEmailVerified = googleUser.EmailVerified
+                    };
+                    _db.Customers.Add(newCustomer);
+                    await _db.SaveChangesAsync();
+                    linkedCustomerId = newCustomer.CustomerId;
+                }
+
                 user = new User
                 {
                     FirstName = !string.IsNullOrWhiteSpace(googleUser.FirstName) ? googleUser.FirstName : "Google",
                     LastName = !string.IsNullOrWhiteSpace(googleUser.LastName) ? googleUser.LastName : "User",
                     Email = googleUser.Email,
-                    Mobile = "",
+                    Mobile = "9876543210",
                     Password = "",
                     RoleId = customerRole.RoleId,
                     Role = customerRole,
+                    CustomerId = linkedCustomerId,
                     IsTwoFaEnabled = false,
                     IsEmailVerified = googleUser.EmailVerified,
                     GoogleSubjectId = googleUser.GoogleSubjectId,
@@ -184,6 +253,34 @@ namespace GoLoan.Infrastructure.Repositories.Auth
             else
             {
                 bool updated = false;
+
+                if (user.CustomerId == null && (user.Role?.RoleName == "Customer" || user.RoleId == 1))
+                {
+                    var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Email == user.Email);
+                    if (customer == null)
+                    {
+                        customer = new Customer
+                        {
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Age = 25,
+                            Email = user.Email,
+                            Password = "",
+                            MobileNo = !string.IsNullOrEmpty(user.Mobile) ? user.Mobile : "9876543210",
+                            Pan = "ABCDE1234F",
+                            AadhaarNo = "123456789012",
+                            EmploymentType = "Salaried",
+                            MonthlyIncome = 50000,
+                            MonthlyInvestment = 0,
+                            IsEmailVerified = user.IsEmailVerified
+                        };
+                        _db.Customers.Add(customer);
+                        await _db.SaveChangesAsync();
+                    }
+                    user.CustomerId = customer.CustomerId;
+                    updated = true;
+                }
+
                 if (string.IsNullOrEmpty(user.GoogleSubjectId))
                 {
                     user.GoogleSubjectId = googleUser.GoogleSubjectId;
@@ -200,7 +297,6 @@ namespace GoLoan.Infrastructure.Repositories.Auth
                 }
             }
 
-            // Generate GoLoan JWT
             var token = _jwtService.GenerateToken(user);
 
             return new AuthResponseDTO
@@ -217,7 +313,6 @@ namespace GoLoan.Infrastructure.Repositories.Auth
                 CustomerId = user.CustomerId
             };
         }
-
         public async Task<UserProfileDTO?> GetUserProfileAsync(int userId)
         {
             var user = await _db.Users
