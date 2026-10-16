@@ -30,11 +30,9 @@ namespace GoLoan.Controllers
                         .Distinct()
                         .CountAsync(),
 
-                    TotalApprovedKyc = await _db.KycDocuments
-                        .Where(x => x.VerificationStatus == "Approved")
-                        .Select(x => x.CustomerId)
-                        .Distinct()
-                        .CountAsync(),
+                    // Only count customers where all 3 documents are approved
+                    TotalApprovedKyc = await _db.Customers
+                        .CountAsync(c => c.KycDocuments.Count == 3 && c.KycDocuments.All(d => d.VerificationStatus == "Approved")),
 
                     TotalLoanAmount = await _db.LoanDeals
                         .SumAsync(x => (decimal?)x.LoanAmount) ?? 0,
