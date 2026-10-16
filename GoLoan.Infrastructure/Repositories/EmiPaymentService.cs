@@ -178,7 +178,7 @@ namespace GoLoan.Infrastructure.Repositories
             }
 
             loanAccount.OutstandingPrincipal -= emi.PrincipalAmount;
-            loanAccount.TotalPaidAmount += details.TotalAmount;
+            loanAccount.TotalPaidAmount += emi.Emi;
 
             await data.SaveChangesAsync();
         }
