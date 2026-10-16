@@ -15,20 +15,18 @@ namespace GoLoan.Infrastructure.Repositories
     {
         AppDbContext data;
         RazorpayService razorpayService;
-<<<<<<< HEAD
 
         private readonly IEmiSchedular emiSchedular;
-        public ForeClosureService(AppDbContext data, RazorpayService razorpayService,IEmiSchedular emiSchedular)
-=======
-        private readonly IEmiSchedular emiSchedular;
-        public ForeClosureService(AppDbContext data, RazorpayService razorpayService, IEmiSchedular emiSchedular)
->>>>>>> e7181e07511235a06511122fcb06f4985f90ebaf
+
+        public ForeClosureService(
+            AppDbContext data,
+            RazorpayService razorpayService,
+            IEmiSchedular emiSchedular)
         {
             this.data = data;
             this.razorpayService = razorpayService;
             this.emiSchedular = emiSchedular;
         }
-
 
         public async Task  CreateForeClosureRequest(ForeClosureRequestDto dto)
         {
