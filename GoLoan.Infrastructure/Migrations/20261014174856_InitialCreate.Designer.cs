@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoLoan.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:GoLoan.Infrastructure/Migrations/20261014075710_Addcol.Designer.cs
+    [Migration("20261014075710_Addcol")]
+    partial class Addcol
+========
     [Migration("20261014174856_InitialCreate")]
     partial class InitialCreate
+>>>>>>>> e7181e07511235a06511122fcb06f4985f90ebaf:GoLoan.Infrastructure/Migrations/20261014174856_InitialCreate.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

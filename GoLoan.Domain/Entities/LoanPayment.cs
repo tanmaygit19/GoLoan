@@ -12,7 +12,7 @@ namespace GoLoan.Domain.Entities
         public int LoanAccountId { get; set; }
 
         [ForeignKey("EmiSchedule")]
-        public int EmiScheduleId { get; set; }
+        public int? EmiScheduleId { get; set; }
 
         public EmiSchedule? EmiSchedule { get; set; }
 
@@ -24,6 +24,7 @@ namespace GoLoan.Domain.Entities
         public decimal PrincipalPaid { get; set; }
         public decimal InterestPaid { get; set; }
         public decimal PenaltyPaid { get; set; }
+        public decimal BonusPaid { get; set; }
         public string PaymentStatus { get; set; }
         public LoanAccount? LoanAccount { get; set; }
     }
