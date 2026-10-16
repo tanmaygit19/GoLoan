@@ -15,10 +15,12 @@ namespace GoLoan.Infrastructure.Repositories
     {
         private readonly AppDbContext db;
         private readonly  IMapper mapper;
-        public LoanAccountService(AppDbContext db, IMapper mapper)
+        private readonly IEmiSchedular emiSchedular;
+        public LoanAccountService(AppDbContext db, IMapper mapper, IEmiSchedular emiSchedular)
         {
             this.db = db;
             this.mapper = mapper;
+            this.emiSchedular = emiSchedular;
         }
         public async Task<bool> AccountExist(int id)
         {
@@ -66,6 +68,8 @@ namespace GoLoan.Infrastructure.Repositories
             };
 
             await AddLoanAccount(account);
+
+            await emiSchedular.GenerateEmiSchedule(account.LoanAccountId);
 
             return mapper.Map<LoanAccountDTO>(account);
         }

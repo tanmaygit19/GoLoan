@@ -38,6 +38,7 @@ namespace GoLoan.Controllers
 
 
         [HttpGet]
+        
         public async Task<IActionResult> GetAccounts()
         {
             var accounts = await service.GetAccounts();

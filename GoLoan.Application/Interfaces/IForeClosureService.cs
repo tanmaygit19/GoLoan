@@ -10,6 +10,8 @@ namespace GoLoan.Application.Interfaces
     {
         Task CreateForeClosureRequest(ForeClosureRequestDto dto);
         Task<List<GetForeClosureRequestDto>> GetAllForeClosureRequests();
+        Task<List<GetForeClosureRequestAdminDto>>GetAllForeClosureRequestsForAdmin();
+        Task<List<GetClosureRequestDto>> GetAllClosureRequests();
         Task ApproveRequest(int requestId);
         Task RejectRequest(int requestId);
         Task<string> CreateForeClosurePaymentOrder(int requestId);

@@ -29,6 +29,7 @@ namespace GoLoan.Infrastructure.Repositories
             if (emi == null)
             {
                 throw new Exception("EMI not found");
+
             }
 
             if (emi.PaymentStatus == "Paid")
@@ -37,20 +38,29 @@ namespace GoLoan.Infrastructure.Repositories
             }
 
             int lateDays = 0;
-            int penalty = 0;
-            int bonus = 0;
+            decimal penalty = 0;
+            decimal bonus = 0;
 
-            if (DateTime.Today > emi.DueDate.Date)
+            DateTime today = DateTime.Today;
+            DateTime dueDate = emi.DueDate.Date;
+
+            if (today < dueDate)
             {
-                lateDays = (DateTime.Today - emi.DueDate.Date).Days;
-                penalty = lateDays * 1;
+                throw new Exception($"EMI payment is allowed only on or after {dueDate:dd-MMM-yyyy}");
             }
-            else
+
+            if (today == dueDate)
             {
-                bonus = 10;
+                bonus = 100; 
+            }
+            else if (today > dueDate)
+            {
+                lateDays = (today - dueDate).Days;
+                penalty = lateDays * 1;
             }
 
             decimal total = emi.Emi + penalty - bonus;
+
 
             return new EmiPaymentDetailsDto
             {
@@ -68,36 +78,44 @@ namespace GoLoan.Infrastructure.Repositories
 
         public async Task<string> CreateEmiPaymentOrder(int emiScheduleId)
         {
-            var emi = await data.EmiSchedules.FirstOrDefaultAsync(x => x.EmiScheduleId == emiScheduleId);
+            var emi = await data.EmiSchedules
+                .FirstOrDefaultAsync(x => x.EmiScheduleId == emiScheduleId);
 
             if (emi == null)
             {
                 throw new Exception("EMI not found");
+
             }
 
             if (emi.PaymentStatus == "Paid")
             {
                 throw new Exception("EMI already paid");
-            }
 
-            
-            if (!string.IsNullOrEmpty(emi.RazorpayOrderId))
-            {
-                return emi.RazorpayOrderId;
             }
-               
 
             var details = await GetEmiPaymentDetails(emiScheduleId);
+
+            if (!string.IsNullOrEmpty(emi.RazorpayOrderId)&& emi.RazorpayAmount == details.TotalAmount)
+            {
+                long existingAmount = razorpayService.GetOrderAmount(emi.RazorpayOrderId);
+
+                if (existingAmount == decimal.ToInt64(details.TotalAmount * 100))
+                {
+                    return emi.RazorpayOrderId;
+                }
+            }
 
             string orderId = razorpayService.CreateOrder(details.TotalAmount,emiScheduleId);
 
             emi.RazorpayOrderId = orderId;
+            emi.RazorpayAmount = details.TotalAmount;
+            emi.RazorpayPenalty = details.Penalty;
+            emi.RazorpayBonus = details.Bonus;
 
             await data.SaveChangesAsync();
 
             return orderId;
         }
-
 
         public async Task VerifyEmiPayment(VerifyEmiPaymentDto dto)
           { 
@@ -113,12 +131,22 @@ namespace GoLoan.Infrastructure.Repositories
                 throw new Exception("EMI already paid");
             }
 
-            var details = await GetEmiPaymentDetails(dto.EmiScheduleId);
+            if (string.IsNullOrEmpty(emi.RazorpayOrderId) ||
+                emi.RazorpayOrderId != dto.RazorpayOrderId ||
+                emi.RazorpayAmount == null ||
+                emi.RazorpayPenalty == null ||
+                emi.RazorpayBonus == null)
+            {
+                throw new Exception("Invalid or expired EMI payment order");
+            }
+
+            decimal finalAmount = emi.RazorpayAmount.Value;
+            decimal finalPenalty = emi.RazorpayPenalty.Value;
+            decimal finalBonus = emi.RazorpayBonus.Value;
 
             razorpayService.VerifyPayment(dto.RazorpayOrderId,dto.RazorpayPaymentId, dto.RazorpaySignature);
 
-            bool isValid = razorpayService.VerifyPaymentDetails(dto.RazorpayPaymentId,dto.RazorpayOrderId,details.TotalAmount);
-
+            bool isValid = razorpayService.VerifyPaymentDetails(dto.RazorpayPaymentId,dto.RazorpayOrderId,finalAmount);
             if (!isValid)
             {
                 throw new Exception("Payment verification failed");
@@ -133,12 +161,13 @@ namespace GoLoan.Infrastructure.Repositories
                 EmiScheduleId = emi.EmiScheduleId,
                 PaymentName = "EMI",
                 PaymentDate = DateTime.Now,
-                PaidAmount = details.TotalAmount,
+                PaidAmount = finalAmount,
                 PaymentMode = "Online",
                 TransactionReference = dto.RazorpayPaymentId,
                 PrincipalPaid = emi.PrincipalAmount,
                 InterestPaid = emi.InterestAmount,
-                PenaltyPaid = details.Penalty,
+                PenaltyPaid = finalPenalty,
+                BonusPaid = finalBonus,
                 PaymentStatus = "Success"
             });
 

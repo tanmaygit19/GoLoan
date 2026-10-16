@@ -1,6 +1,7 @@
 ﻿using GoLoan.Application.DTO;
 using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
+using GoLoan.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,12 @@ namespace GoLoan.Controllers
     public class ForeClosureController : ControllerBase
     {
         IForeClosureService service;
+        private readonly IEmiSchedular emiSchedular;
 
-        public ForeClosureController(IForeClosureService service)
+        public ForeClosureController(IForeClosureService service, IEmiSchedular emiSchedular)
         {
             this.service = service;
-
+            this.emiSchedular = emiSchedular;
         }
 
 
@@ -109,14 +111,39 @@ namespace GoLoan.Controllers
             try
             {
                 await service.VerifyForeClosurePayment(dto);
-                return Ok("Foreclosure payment successful");
+                return Ok(new {message= "Foreclosure payment successful" });
             }
 
             catch(Exception ex)
             {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetReqForAdmin")]
+        public async Task<IActionResult> GetReqForAdmin()
+        {
+            try
+            {
+                var data = await service.GetAllForeClosureRequestsForAdmin();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [HttpGet]
+        [Route("GetAllClosureRequests")]
+        public async Task<IActionResult> GetAllClosureRequests()
+        {
+            var result = await service.GetAllClosureRequests();
+            return Ok(result);
+        }
+
 
     }
 }

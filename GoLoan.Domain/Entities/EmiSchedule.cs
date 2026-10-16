@@ -22,6 +22,11 @@ namespace GoLoan.Domain.Entities
         public LoanAccount? LoanAccount { get; set; }
         public string? RazorpayOrderId { get; set; }
 
+        public decimal? RazorpayAmount { get; set; }
+
+        public decimal? RazorpayPenalty { get; set; }
+        public decimal? RazorpayBonus { get; set; }
+
 
     }
 }

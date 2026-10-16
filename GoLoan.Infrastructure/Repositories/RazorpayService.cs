@@ -27,6 +27,9 @@ namespace GoLoan.Infrastructure.Repositories
                 { "receipt", $"FC_{requestId}" }
             };
 
+            Console.WriteLine($"Foreclosure Amount (Rupees): {amount}");
+            Console.WriteLine($"Foreclosure Amount (Paise): {decimal.ToInt64(amount * 100)}");
+
             Order order = client.Order.Create(options);
 
             return order["id"].ToString();
@@ -52,10 +55,14 @@ namespace GoLoan.Infrastructure.Repositories
             string keySecret = configuration["Razorpay:KeySecret"];
 
             RazorpayClient client = new RazorpayClient(keyId, keySecret);
-
             Payment payment = client.Payment.Fetch(paymentId);
 
-            return payment["status"].ToString() == "captured";
+            string status = payment["status"].ToString();
+
+            Console.WriteLine("Payment ID: " + paymentId);
+            Console.WriteLine("Payment Status: " + status);
+
+            return status == "captured";
         }
 
 
@@ -66,11 +73,26 @@ namespace GoLoan.Infrastructure.Repositories
 
             RazorpayClient client = new RazorpayClient(keyId, keySecret);
             Payment payment = client.Payment.Fetch(paymentId);
-
+            Console.WriteLine("Order ID: " + payment["order_id"]);
+            Console.WriteLine("Amount: " + payment["amount"]);
+            Console.WriteLine("Currency: " + payment["currency"]);
+            Console.WriteLine("Status: " + payment["status"]);
             return payment["order_id"].ToString() == orderId
                 && Convert.ToInt64(payment["amount"]) == decimal.ToInt64(expectedAmount * 100)
                 && payment["currency"].ToString() == "INR"
                 && payment["status"].ToString() == "captured";
+        }
+
+        public long GetOrderAmount(string orderId)
+        {
+            string keyId = configuration["Razorpay:KeyId"]!;
+            string keySecret = configuration["Razorpay:KeySecret"]!;
+
+            RazorpayClient client = new RazorpayClient(keyId, keySecret);
+
+            Order order = client.Order.Fetch(orderId);
+
+            return Convert.ToInt64(order["amount"]);
         }
 
     }

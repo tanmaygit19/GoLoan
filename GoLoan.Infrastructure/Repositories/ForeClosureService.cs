@@ -15,10 +15,13 @@ namespace GoLoan.Infrastructure.Repositories
     {
         AppDbContext data;
         RazorpayService razorpayService;
-        public ForeClosureService(AppDbContext data, RazorpayService razorpayService)
+
+        private readonly IEmiSchedular emiSchedular;
+        public ForeClosureService(AppDbContext data, RazorpayService razorpayService,IEmiSchedular emiSchedular)
         {
             this.data = data;
             this.razorpayService = razorpayService;
+            this.emiSchedular = emiSchedular;
         }
 
 
@@ -145,7 +148,6 @@ namespace GoLoan.Infrastructure.Repositories
         }
 
 
-
         public async Task<string> CreateForeClosurePaymentOrder(int requestId)
         {
             var request = await data.ForeClosureRequests.FirstOrDefaultAsync(x => x.RequestId == requestId);
@@ -153,24 +155,34 @@ namespace GoLoan.Infrastructure.Repositories
             if (request == null)
             {
                 throw new Exception("Request not found");
+
             }
 
             if (request.Status != "Approved")
             {
                 throw new Exception("Request is not approved");
+
             }
 
             if (request.IsPaid)
             {
                 throw new Exception("Already paid");
+
             }
 
             if (!string.IsNullOrEmpty(request.RazorpayOrderId))
             {
-                return request.RazorpayOrderId;
+                long existingAmount = razorpayService.GetOrderAmount(request.RazorpayOrderId);
+
+                long expectedAmount = decimal.ToInt64(request.ForeClosureAmount * 100);
+
+                if (existingAmount == expectedAmount)
+                {
+                    return request.RazorpayOrderId;
+                }
             }
 
-            string orderId = razorpayService.CreateOrder(request.ForeClosureAmount, requestId);
+            string orderId = razorpayService.CreateOrder(request.ForeClosureAmount,requestId);
 
             request.RazorpayOrderId = orderId;
 
@@ -178,6 +190,9 @@ namespace GoLoan.Infrastructure.Repositories
 
             return orderId;
         }
+
+
+ 
 
         public async Task VerifyForeClosurePayment(VerifyForeClosurePaymentDto dto)
         {
@@ -197,6 +212,7 @@ namespace GoLoan.Infrastructure.Repositories
             {
                 throw new Exception("Invalid Order ID");
             }
+
 
 
             bool signatureValid = razorpayService.VerifyPayment(dto.RazorpayOrderId,dto.RazorpayPaymentId,dto.RazorpaySignature);
@@ -248,12 +264,13 @@ namespace GoLoan.Infrastructure.Repositories
         public async Task<List<GetForeClosureRequestDto>> GetAllForeClosureRequests()
         {
 
-             return await data.ForeClosureRequests.Include(x => x.LoanAccount)
-            .Select(x => new GetForeClosureRequestDto
+             return await data.ForeClosureRequests.Include(x => x.LoanAccount).Select(x => new GetForeClosureRequestDto
             {
+                RequestId = x.RequestId,
                 LoanAccountNo = x.LoanAccount.LoanAccountNo,
                 Amount = x.ForeClosureAmount,
                 Type = x.ForeClosureType,
+                NoOfEmi = x.NoOfEmi,
                 Reason = x.Reason,
                 Status = x.Status
 
@@ -261,5 +278,36 @@ namespace GoLoan.Infrastructure.Repositories
                  
           
         }
+
+
+        public async Task<List<GetForeClosureRequestAdminDto>>GetAllForeClosureRequestsForAdmin()
+        {
+            return await data.ForeClosureRequests.Include(x => x.LoanAccount).ThenInclude(x => x.Customer).Select(x => new GetForeClosureRequestAdminDto
+                {
+                    RequestId = x.RequestId,
+                    LoanAccountNo = x.LoanAccount.LoanAccountNo,
+                    CustomerName = x.LoanAccount.Customer.FirstName,
+                    Type = x.ForeClosureType,
+                    RequestedDate = x.RequestedDate,
+                    OutstandingPrincipal = x.LoanAccount.OutstandingPrincipal,
+                    Amount = x.ForeClosureAmount,
+                    Status = x.Status
+                }).ToListAsync();
+        }
+
+
+        public async Task<List<GetClosureRequestDto>> GetAllClosureRequests()
+        {
+            return await data.ForeClosureRequests.Include(x => x.LoanAccount).ThenInclude(x => x.Customer).Where(x =>x.ForeClosureType == "Full" &&x.Status == "Completed" && x.IsPaid).Select(x => new GetClosureRequestDto
+                {
+                    RequestId = x.RequestId,
+                    LoanAccountNo = x.LoanAccount.LoanAccountNo,
+                    CustomerName = x.LoanAccount.Customer.FirstName,
+                    ForeClosureAmount = x.ForeClosureAmount,
+                    PaidDate = x.PaidDate,
+                    Status = x.Status
+                }).ToListAsync();
+        }
+
     }
 }
