@@ -28,5 +28,11 @@ namespace GoLoan.Application.DTO.Auth
 
         [Required(ErrorMessage = "Role ID is required")]
         public int RoleId { get; set; }
+        public int? Age { get; set; }
+        public string? Pan { get; set; }
+        public string? AadhaarNo { get; set; }
+        public string? EmploymentType { get; set; }
+        public decimal? MonthlyIncome { get; set; }
+        public decimal? MonthlyInvestment { get; set; }
     }
 }

@@ -67,19 +67,19 @@ namespace GoLoan.Infrastructure.Migrations
                 name: "CibilReports",
                 columns: table => new
                 {
-                    CibilReportId = table.Column<int>(type: "int", nullable: false)
+                    cibilReportId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    PanNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CibilScore = table.Column<int>(type: "int", nullable: false),
-                    CheckDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    customerId = table.Column<int>(type: "int", nullable: false),
+                    panNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    cibilScore = table.Column<int>(type: "int", nullable: false),
+                    checkDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CibilReports", x => x.CibilReportId);
+                    table.PrimaryKey("PK_CibilReports", x => x.cibilReportId);
                     table.ForeignKey(
-                        name: "FK_CibilReports_Customers_CustomerId",
-                        column: x => x.CustomerId,
+                        name: "FK_CibilReports_Customers_customerId",
+                        column: x => x.customerId,
                         principalTable: "Customers",
                         principalColumn: "CustomerId");
                 });
@@ -548,9 +548,9 @@ namespace GoLoan.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CibilReports_CustomerId",
+                name: "IX_CibilReports_customerId",
                 table: "CibilReports",
-                column: "CustomerId");
+                column: "customerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DealReviews_DealId",

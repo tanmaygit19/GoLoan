@@ -35,10 +35,10 @@
   <ItemGroup>
     <ProjectReference Include="..\GoLoan.Application\GoLoan.Application.csproj" />
     <ProjectReference Include="..\GoLoan.Infrastructure\GoLoan.Infrastructure.csproj" />
+	  <ProjectReference Include="..\GoLoan.Domain\GoLoan.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Exception\" />
     <Folder Include="Views\" />
   </ItemGroup>
 

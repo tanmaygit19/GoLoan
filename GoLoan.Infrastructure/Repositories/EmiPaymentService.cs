@@ -170,6 +170,15 @@ namespace GoLoan.Infrastructure.Repositories
                 BonusPaid = finalBonus,
                 PaymentStatus = "Success"
             });
+            var loanAccount = await data.LoanAccounts.FirstOrDefaultAsync(x =>x.LoanAccountId == emi.LoanAccountId);
+
+            if (loanAccount == null)
+            {
+                throw new Exception("Loan account not found");
+            }
+
+            loanAccount.OutstandingPrincipal -= emi.PrincipalAmount;
+            loanAccount.TotalPaidAmount += details.TotalAmount;
 
             await data.SaveChangesAsync();
         }
