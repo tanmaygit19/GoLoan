@@ -109,12 +109,24 @@ namespace GoLoan.Controllers
 
                 var rows = customerList.Select(c =>
                 {
-                    var docs = c.KycDocuments ?? new();
+                    var docs = c.KycDocuments ?? new List<KycDocument>();
                     string kyc = "Pending";
-                    if (docs.Count == 3 && docs.All(d => d.VerificationStatus == "Approved"))
+
+                    bool allThreeApproved = docs.Count == 3 && docs.All(d => d.VerificationStatus == "Approved");
+                    bool anyRejected = docs.Any(d => d.VerificationStatus == "Rejected");
+
+                    if (allThreeApproved)
+                    {
                         kyc = "Approved";
-                    else if (docs.Any(d => d.VerificationStatus == "Rejected"))
+                    }
+                    else if (anyRejected)
+                    {
                         kyc = "Rejected";
+                    }
+                    else
+                    {
+                        kyc = "Pending";
+                    }
 
                     var cibil = c.CibilReports?.OrderByDescending(r => r.checkDate).FirstOrDefault()?.cibilScore ?? 0;
 

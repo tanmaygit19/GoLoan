@@ -134,6 +134,7 @@ namespace GoLoan.Controllers
             });
         }
 
+
         [HttpDelete("{documentId}")]
         public async Task<IActionResult> DeleteDocument(int documentId)
         {
@@ -172,16 +173,16 @@ namespace GoLoan.Controllers
                     approvedCount = c.KycDocuments.Count(d => d.VerificationStatus == "Approved"),
                     pendingCount = c.KycDocuments.Count(d => d.VerificationStatus == "Pending"),
                     rejectedCount = c.KycDocuments.Count(d => d.VerificationStatus == "Rejected"),
-                    status = c.KycDocuments.Count == 3 && c.KycDocuments.All(d => d.VerificationStatus == "Approved")
+                    status = (c.KycDocuments.Count == 3 && c.KycDocuments.All(d => d.VerificationStatus == "Approved"))
                         ? "Approved"
                         : c.KycDocuments.Any(d => d.VerificationStatus == "Rejected")
                             ? "Rejected"
                             : "Pending"
                 })
                 .ToListAsync();
-
             return Ok(customers);
         }
+
 
         [HttpGet("Officer/CustomerDocs/{customerId}")]
         public async Task<IActionResult> GetCustomerDocsForReview(int customerId)
