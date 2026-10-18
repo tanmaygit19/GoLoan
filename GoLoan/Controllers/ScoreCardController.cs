@@ -32,5 +32,12 @@ namespace GoLoan.API.Controllers
                 scoreCard.EligibleLoanAmount
             });
         }
+
+        [HttpGet("Customers")]
+        public IActionResult GetCustomers()
+        {
+            var customers = scoreCardService.GetCustomers();
+            return Ok(customers);
+        }
     }
 }

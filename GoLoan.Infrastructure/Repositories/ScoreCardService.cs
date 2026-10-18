@@ -23,7 +23,7 @@ namespace GoLoan.Infrastructure.Repositories
                 return null;
             }
 
-            // Find latest CIBIL report
+            // Find CIBIL report
             var cibilReport = db.CibilReports
                 .Where(x => x.customerId == id)
                 .OrderByDescending(x => x.checkDate)
@@ -37,63 +37,61 @@ namespace GoLoan.Infrastructure.Repositories
             // Calculate risk category
             string riskCategory;
 
-            if (cibilReport.cibilScore >= 900)
+            if (cibilReport.cibilScore >= 750)
             {
-                riskCategory = "Excellent";
-            }
-            else if (cibilReport.cibilScore >= 800)
-            {
-                riskCategory = "Very Good";
-            }
-            else if (cibilReport.cibilScore >= 750)
-            {
-                riskCategory = "Good";
-            }
-            else if (cibilReport.cibilScore >= 700)
-            {
-                riskCategory = "Average";
+                riskCategory = "Low";
             }
             else if (cibilReport.cibilScore >= 650)
             {
-                riskCategory = "Risky";
+                riskCategory = "Medium";
             }
             else
             {
-                riskCategory = "Reject";
+                riskCategory = "High";
             }
 
             // Calculate eligible loan amount
             decimal monthlyIncome = customer.MonthlyIncome;
-            decimal existingMonthlyEMI = 0;
+            decimal eligibleLoanAmount;
 
-            decimal availableEMI = monthlyIncome - existingMonthlyEMI;
-                
-            decimal annualInterestRate = 11;
-            int tenureInYears = 5;
+            if (monthlyIncome > 100000)
+            {
+                eligibleLoanAmount = 5000000;
+            }
+            else if (monthlyIncome > 50000)
+            {
+                eligibleLoanAmount = 4000000;
+            }
+            else
+            {
+                eligibleLoanAmount = 1000000;
+            }
 
-            decimal monthlyInterestRate = annualInterestRate / 1200;
-            int totalInstallments = tenureInYears * 12;
+            // Check existing score card
+            var scoreCard = db.ScoreCards
+                .FirstOrDefault(x => x.CustomerId == id);
 
-            double rate = (double)monthlyInterestRate;
+            if (scoreCard == null)
+            {
+                scoreCard = new ScoreCard();
+                scoreCard.CustomerId = id;
 
-            double factor =
-                (Math.Pow(1 + rate, totalInstallments) - 1) /
-                (rate * Math.Pow(1 + rate, totalInstallments));
+                db.ScoreCards.Add(scoreCard);
+            }
 
-            decimal eligibleLoanAmount = availableEMI * (decimal)factor;
-
-            // Create score card
-            ScoreCard scoreCard = new ScoreCard();
-
-            scoreCard.CustomerId = id;
+            // Update score card
             scoreCard.RiskCategory = riskCategory;
-            scoreCard.EligibleLoanAmount = Math.Round(eligibleLoanAmount, 2);
+            scoreCard.EligibleLoanAmount = eligibleLoanAmount;
 
-            // Save score card
-            db.ScoreCards.Add(scoreCard);
+            // Save changes
             db.SaveChanges();
 
             return scoreCard;
+        }
+
+        public List<Customer> GetCustomers()
+        {
+            return db.Customers.ToList();
         }
     }
 }
