@@ -92,6 +92,10 @@ namespace GoLoan.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("MonthlyInvestment")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Pan")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

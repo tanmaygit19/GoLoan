@@ -70,14 +70,11 @@ namespace GoLoan.Controllers
             public IActionResult downloadsanction(int sanctionid)
             {
                 var data = service.downloadsanction(sanctionid);
-
                 if (data == null)
                 {
                     return NotFound("Sanction letter not found or loan is not approved");
                 }
-
-                return File(data, "application/pdf",
-                    "SanctionLetter_" + sanctionid + ".pdf");
+                return File(data, "application/pdf","SanctionLetter_" + sanctionid + ".pdf");
             }
 
         

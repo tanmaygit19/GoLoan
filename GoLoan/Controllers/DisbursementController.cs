@@ -101,6 +101,11 @@ namespace GoLoan.Controllers
                 });
             }
 
+        [HttpGet]
+        [Route("FetchDisbursementsByStatus")]
+        public IActionResult fetchdisbursementsbystatus(string status)
+        {
+            var data = service.fetchdisbursementsbystatus(status);
             bool accountExists =
                 await loanAccountService.AccountExist(
                     disbursement.DealId);
@@ -146,6 +151,11 @@ namespace GoLoan.Controllers
             {
                 success = true,
                 error = false,
+                data = data,
+                message = "Disbursements Fetched Successfully"
+            });
+        }
+            
                 data = null,
                 message = "Disbursement Rejected Successfully"
             });

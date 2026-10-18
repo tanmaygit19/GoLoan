@@ -42,25 +42,20 @@ namespace GoLoan.Infrastructure.Repositories
         {
         
             var data = db.Disbursements.ToList();
-
             var mdata = mapper.Map<List<DisbursementDTO2>>(data);
-
             return mdata;
         }
 
         public DisbursementDTO2 fetchdisbursementbyid(int id)
         {
             var data = db.Disbursements.FirstOrDefault(x => x.DisbursementId == id);
-
             var mdata = mapper.Map<DisbursementDTO2>(data);
-
             return mdata;
         }
 
         public void approvedisbursement(int disbursementid)
         {
             var data = db.Disbursements.FirstOrDefault(x => x.DisbursementId == disbursementid);
-
             if (data != null && data.Status == "Pending")
             {
                 data.Status = "Approved";
@@ -70,9 +65,7 @@ namespace GoLoan.Infrastructure.Repositories
 
         public void rejectdisbursement(int disbursementid)
         {
-            var data = db.Disbursements
-                .FirstOrDefault(x => x.DisbursementId == disbursementid);
-
+            var data = db.Disbursements.FirstOrDefault(x => x.DisbursementId == disbursementid);
             if (data != null && data.Status == "Pending")
             {
                 data.Status = "Rejected";
@@ -82,12 +75,8 @@ namespace GoLoan.Infrastructure.Repositories
 
         public List<DisbursementDTO2> fetchdisbursementsbystatus(string status)
         {
-            var data = db.Disbursements
-                .Where(x => x.Status == status)
-                .ToList();
-
+            var data = db.Disbursements.Where(x => x.Status == status).ToList();
             var mdata = mapper.Map<List<DisbursementDTO2>>(data);
-
             return mdata;
         }
 
