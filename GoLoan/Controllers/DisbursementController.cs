@@ -1,7 +1,8 @@
-﻿using GoLoan.Application.DTO;
+﻿
+using GoLoan.Application.DTO;
 using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
-using Microsoft.AspNetCore.Http;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoLoan.Controllers
@@ -10,89 +11,155 @@ namespace GoLoan.Controllers
     [ApiController]
     public class DisbursementController : ControllerBase
     {
+        private readonly IDisbursement service;
+        private readonly ILoanAccountService loanAccountService;
+        private readonly IBackgroundJobClient backgroundJobClient;
 
-            IDisbursement service;
+        public DisbursementController(
+            IDisbursement disbursement,
+            ILoanAccountService loanAccountService,
+            IBackgroundJobClient backgroundJobClient)
+        {
+            service = disbursement;
+            this.loanAccountService = loanAccountService;
+            this.backgroundJobClient = backgroundJobClient;
+        }
 
-            public DisbursementController(IDisbursement disbursement)
+        [HttpPost]
+        [Route("AddDisbursement")]
+        public IActionResult adddisbursement(DisbursementDTO dis)
+        {
+            service.adddisbursement(dis);
+
+            return Ok(new CommonResponse
             {
-                this.service = disbursement;
-            }
+                success = true,
+                error = false,
+                data = null,
+                message = "Disbursement Added Successfully"
+            });
+        }
 
+        [HttpGet]
+        [Route("FetchDisbursement")]
+        public IActionResult fetchdisbursement()
+        {
+            var data = service.fetchdisbursement();
 
-            [HttpPost]
-            [Route("AddDisbursement")]
-            public IActionResult adddisbursement(DisbursementDTO dis)
+            return Ok(new CommonResponse
             {
-                service.adddisbursement(dis);
+                success = true,
+                error = false,
+                data = data,
+                message = "Disbursements Fetched Successfully"
+            });
+        }
 
-                return Ok(new CommonResponse
+        [HttpGet]
+        [Route("FetchDisbursementById")]
+        public IActionResult fetchdisbursementbyid(int id)
+        {
+            var data = service.fetchdisbursementbyid(id);
+
+            return Ok(new CommonResponse
+            {
+                success = true,
+                error = false,
+                data = data,
+                message = "Disbursement Fetched Successfully"
+            });
+        }
+
+        [HttpPut]
+        [Route("ApproveDisbursement")]
+        public async Task<IActionResult> approvedisbursement(
+            int disbursementid)
+        {
+            var disbursement =
+                service.fetchdisbursementbyid(disbursementid);
+
+            if (disbursement == null)
+            {
+                return NotFound(new
                 {
-                    success = true,
-                    error = false,
-                    data = null,
-                    message = "Disbursement Added Successfully"
+                    message = "Disbursement not found"
                 });
             }
 
-            [HttpGet]
-            [Route("FetchDisbursement")]
-            public IActionResult fetchdisbursement()
-            {
-                var data = service.fetchdisbursement();
 
-                return Ok(new CommonResponse
+            service.approvedisbursement(disbursementid);
+
+            disbursement =
+                service.fetchdisbursementbyid(disbursementid);
+
+            if (disbursement == null ||
+                disbursement.Status != "Approved")
+            {
+                return BadRequest(new
                 {
-                    success = true,
-                    error = false,
-                    data = data,
-                    message = "Disbursement Added Successfully"
+                    message = "Disbursement is not approved"
                 });
             }
 
-            [HttpGet]
-            [Route("FetchDisbursementById")]
-            public IActionResult fetchdisbursementbyid(int id)
-            {
-                var data = service.fetchdisbursementbyid(id);
+        [HttpGet]
+        [Route("FetchDisbursementsByStatus")]
+        public IActionResult fetchdisbursementsbystatus(string status)
+        {
+            var data = service.fetchdisbursementsbystatus(status);
+            bool accountExists =
+                await loanAccountService.AccountExist(
+                    disbursement.DealId);
 
-                return Ok(new CommonResponse
+            if (!accountExists)
+            {
+                var account =
+                    await loanAccountService.CreateLoanAccount(
+                        disbursement.DealId);
+
+                if (account == null)
                 {
-                    success = true,
-                    error = false,
-                    data = data,
-                    message = "Disbursement Fetched Successfully"
-                });
+                    return BadRequest(new
+                    {
+                        message =
+                            "Disbursement approved, but Loan Account could not be created."
+                    });
+                }
+
+
+                backgroundJobClient.Enqueue<IEmiSchedular>(
+                    x => x.GenerateEmiSchedule(
+                        account.LoanAccountId));
             }
 
-            [HttpPut]
-            [Route("ApproveDisbursement")]
-            public IActionResult approvedisbursement(int disbursementid)
+            return Ok(new CommonResponse
             {
-                service.approvedisbursement(disbursementid);
+                success = true,
+                error = false,
+                data = null,
+                message =
+                    "Disbursement Approved. Loan Account checked/created successfully."
+            });
+        }
 
-                return Ok(new CommonResponse
-                {
-                    success = true,
-                    error = false,
-                    data = null,
-                    message = "Disbursement Approved Successfully"
-                });
-            }
+        [HttpPut]
+        [Route("RejectDisbursement")]
+        public IActionResult rejectdisbursement(int disbursementid)
+        {
+            service.rejectdisbursement(disbursementid);
 
-            [HttpPut]
-            [Route("RejectDisbursement")]
-            public IActionResult rejectdisbursement(int disbursementid)
+            return Ok(new CommonResponse
             {
-                service.rejectdisbursement(disbursementid);
-
-                return Ok(new CommonResponse
-                {
-                    success = true,
-                    error = false,
-                    data = null,
-                    message = "Disbursement Rejected Successfully"
-                });
-            }
+                success = true,
+                error = false,
+                data = data,
+                message = "Disbursements Fetched Successfully"
+            });
+        }
+            
+                data = null,
+                message = "Disbursement Rejected Successfully"
+            });
+        }
 
         [HttpGet]
         [Route("FetchDisbursementsByStatus")]
@@ -108,8 +175,5 @@ namespace GoLoan.Controllers
                 message = "Disbursements Fetched Successfully"
             });
         }
-            
-        }
     }
-
-
+}
