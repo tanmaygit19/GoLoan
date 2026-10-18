@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GoLoan.Domain.Entities
@@ -10,10 +11,21 @@ namespace GoLoan.Domain.Entities
 
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
+
         public int CibilScore { get; set; }
+
         public string? IsEligible { get; set; } = "Pending";
+
         public decimal LoanAmount { get; set; }
+
+        public decimal RequestedLoanAmount { get; set; }
+
+        public int LoanTenureMonths { get; set; }
+
+        public decimal InterestRate { get; set; }
+
         public string? RejectionReason { get; set; }
+
         public Customer? Customer { get; set; }
     }
 }
