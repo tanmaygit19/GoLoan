@@ -8,7 +8,7 @@ namespace GoLoan.Application.Interfaces
 {
     public  interface ILoanDealCreation
     {
-        void addloan(ApplyLoanDTO app);
+        void addloan(ApplyLoanDTO app, int customerid);
 
         List<ApplyLoanDTO> fetchdetails();
 

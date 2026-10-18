@@ -14,11 +14,9 @@ namespace GoLoan.Infrastructure.Repositories
             this.db = db;
         }
 
-        // Generate and save CIBIL report
         public CibilReportDto GenerateCibilReport(int id)
         {
             var data = db.Customers.Find(id);
-
             if (data == null)
             {
                 return null;
@@ -47,15 +45,15 @@ namespace GoLoan.Infrastructure.Repositories
             string employmentType = data.EmploymentType;
             int employmentScore = 0;
 
-            if (employmentType == "Government job")
+            if (employmentType == "Government")
             {
                 employmentScore = 200;
             }
-            else if (employmentType == "Private job")
+            else if (employmentType == "Private")
             {
                 employmentScore = 150;
             }
-            else if (employmentType == "Self-employed" ||
+            else if (employmentType == "Self Employed" ||
                      employmentType == "Business")
             {
                 employmentScore = 100;
@@ -117,7 +115,7 @@ namespace GoLoan.Infrastructure.Repositories
 
             int cibilScore = incomeScore + employmentScore+ ageScore + foirScore;
 
-            // Save CIBIL report
+            
             CibilReport cibilReport = new CibilReport();
 
             cibilReport.customerId = data.CustomerId;
@@ -128,7 +126,7 @@ namespace GoLoan.Infrastructure.Repositories
             db.CibilReports.Add(cibilReport);
             db.SaveChanges();
 
-            // Return generated report
+
             CibilReportDto report = new CibilReportDto();
 
             report.CustomerId = data.CustomerId;
@@ -141,7 +139,6 @@ namespace GoLoan.Infrastructure.Repositories
             return report;
         }
 
-        // View latest saved CIBIL report
         public CibilReportViewDto? GetCibilReport(int id)
         {
             var data = db.CibilReports
@@ -155,7 +152,6 @@ namespace GoLoan.Infrastructure.Repositories
             }
 
             CibilReportViewDto report = new CibilReportViewDto();
-
             report.CustomerId = data.customerId;
             report.CibilScore = data.cibilScore;
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GoLoan.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class New : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,7 @@ namespace GoLoan.Infrastructure.Migrations
                     AadhaarNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmploymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MonthlyIncome = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MonthlyInvestment = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     IsEmailVerified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -362,7 +363,10 @@ namespace GoLoan.Infrastructure.Migrations
                     ClosingBalance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RazorpayOrderId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    RazorpayOrderId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RazorpayAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    RazorpayPenalty = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    RazorpayBonus = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -492,7 +496,7 @@ namespace GoLoan.Infrastructure.Migrations
                     PaymentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LoanAccountId = table.Column<int>(type: "int", nullable: false),
-                    EmiScheduleId = table.Column<int>(type: "int", nullable: false),
+                    EmiScheduleId = table.Column<int>(type: "int", nullable: true),
                     PaymentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaidAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -501,6 +505,7 @@ namespace GoLoan.Infrastructure.Migrations
                     PrincipalPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     InterestPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PenaltyPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    BonusPaid = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>

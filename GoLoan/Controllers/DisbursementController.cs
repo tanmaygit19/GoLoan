@@ -94,23 +94,20 @@ namespace GoLoan.Controllers
                 });
             }
 
-            [HttpGet]
-            [Route("FetchDisbursementsByStatus")]
-            public IActionResult fetchdisbursementsbystatus(string status)
+        [HttpGet]
+        [Route("FetchDisbursementsByStatus")]
+        public IActionResult fetchdisbursementsbystatus(string status)
+        {
+            var data = service.fetchdisbursementsbystatus(status);
+
+            return Ok(new CommonResponse
             {
-                var data = service.fetchdisbursementsbystatus(status);
-
-                return Ok(new CommonResponse
-                {
-                    success = true,
-                    error = false,
-                    data = data,
-                    message = "Disbursements Fetched Successfully"
-                });
-            }
-
-
-
+                success = true,
+                error = false,
+                data = data,
+                message = "Disbursements Fetched Successfully"
+            });
+        }
             
         }
     }

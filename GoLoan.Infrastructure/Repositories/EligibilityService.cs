@@ -15,17 +15,12 @@ namespace GoLoan.Infrastructure.Repositories
 
         public EligibilityResult CheckEligibility(int id)
         {
-            // Find customer
             var customer = db.Customers.Find(id);
-
             if (customer == null)
             {
                 return null;
             }
-
-            // Find latest CIBIL report
-            var cibilReport = db.CibilReports
-                .Where(x => x.customerId == id)
+            var cibilReport = db.CibilReports.Where(x => x.customerId == id)
                 .OrderByDescending(x => x.checkDate)
                 .FirstOrDefault();
 
@@ -34,7 +29,6 @@ namespace GoLoan.Infrastructure.Repositories
                 return null;
             }
 
-            // Check eligibility based on CIBIL score
             string isEligible;
             string? rejectionReason = null;
 
@@ -51,21 +45,15 @@ namespace GoLoan.Infrastructure.Repositories
                 isEligible = "Rejected";
                 rejectionReason = "CIBIL score is below 650.";
             }
-
-            // Get loan amount from Score Card
-            var scoreCard = db.ScoreCards
-                .Where(x => x.CustomerId == id)
+            var scoreCard = db.ScoreCards.Where(x => x.CustomerId == id)
                 .OrderByDescending(x => x.ScoreCardId)
                 .FirstOrDefault();
 
             decimal loanAmount = 0;
-
             if (scoreCard != null)
             {
                 loanAmount = scoreCard.EligibleLoanAmount;
             }
-
-            // Create eligibility result
             EligibilityResult result = new EligibilityResult();
 
             result.CustomerId = id;
@@ -74,10 +62,8 @@ namespace GoLoan.Infrastructure.Repositories
             result.LoanAmount = loanAmount;
             result.RejectionReason = rejectionReason;
 
-            // Save result
             db.EligibilityResults.Add(result);
             db.SaveChanges();
-
             return result;
         }
     }
