@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Hangfire;
+using GoLoan.Exceptions;
 using GoLoan.Application;
 using GoLoan.Application.DTO.Auth;
 using GoLoan.Application.Interfaces;
@@ -28,6 +29,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.Configure<JwtSettingsDTO>(
     builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddHangfire(configuration =>
+    configuration.UseSqlServerStorage(
+        builder.Configuration.GetConnectionString("dbconn")
+    ));
+builder.Services.AddHangfireServer();
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<EmailSettingsDTO>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -89,6 +96,8 @@ builder.Services.AddScoped<RazorpayService>();
 builder.Services.AddScoped<IEmiPaymentService, EmiPaymentService>();
 builder.Services.AddScoped<ICustomerPaymentHistoryService, CustomerPaymentHistoryService>();
 
+// Customer and support services
+
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<ICustomerDashboardService, CustomerDashboardService>();
 
@@ -140,8 +149,34 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+// Angular frontend CORS policy
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("MyApp", policy =>
+//    {
+//        policy.WithOrigins("http://localhost:4200")
+//            .AllowAnyMethod()
+//            .AllowAnyHeader()
+//            .AllowCredentials();
+//    });
+//});
+builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(cfg => { },typeof(LoanAccountMapper).Assembly
+);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("myapp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
+
+app.UseGlobalExceptionMiddleware();
 
 var recurringJobManager =
     app.Services.GetRequiredService<IRecurringJobManager>();
@@ -200,9 +235,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("MyApp");
 app.UseAuthentication();
-app.UseAuthorization();
 app.UseHangfireDashboard();
 app.MapControllers();
 

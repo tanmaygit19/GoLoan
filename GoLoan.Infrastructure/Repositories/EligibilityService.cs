@@ -37,7 +37,6 @@ namespace GoLoan.Infrastructure.Repositories
             int loanTenureMonths)
         {
             var customer = db.Customers.Find(id);
-
             if (customer == null)
             {
                 return null;
@@ -45,6 +44,7 @@ namespace GoLoan.Infrastructure.Repositories
 
             var cibilReport = db.CibilReports
                 .Where(x => x.customerId == id)
+            var cibilReport = db.CibilReports.Where(x => x.customerId == id)
                 .OrderByDescending(x => x.checkDate)
                 .FirstOrDefault();
 
@@ -58,6 +58,8 @@ namespace GoLoan.Infrastructure.Repositories
                 .Where(x => x.CustomerId == id)
                 .OrderByDescending(x => x.ScoreCardId)
                 .FirstOrDefault();
+            string isEligible;
+            string? rejectionReason = null;
 
             if (scoreCard == null)
             {
@@ -106,6 +108,12 @@ namespace GoLoan.Infrastructure.Repositories
             string? rejectionReason = null;
 
             if (cibilReport.cibilScore >= 800)
+            var scoreCard = db.ScoreCards.Where(x => x.CustomerId == id)
+                .OrderByDescending(x => x.ScoreCardId)
+                .FirstOrDefault();
+
+            decimal loanAmount = 0;
+            if (scoreCard != null)
             {
                 status = "Auto Approved";
             }
@@ -121,6 +129,7 @@ namespace GoLoan.Infrastructure.Repositories
 
             // Save eligibility result
             var result = new EligibilityResult();
+            EligibilityResult result = new EligibilityResult();
 
             result.CustomerId = id;
             result.Customer = customer;
@@ -134,7 +143,6 @@ namespace GoLoan.Infrastructure.Repositories
 
             db.EligibilityResults.Add(result);
             db.SaveChanges();
-
             return result;
         }
 

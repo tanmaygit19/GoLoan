@@ -15,10 +15,12 @@ namespace GoLoan.Infrastructure.Repositories
     {
         private readonly AppDbContext db;
         private readonly  IMapper mapper;
-        public LoanAccountService(AppDbContext db, IMapper mapper)
+        private readonly IEmiSchedular emiSchedular;
+        public LoanAccountService(AppDbContext db, IMapper mapper, IEmiSchedular emiSchedular)
         {
             this.db = db;
             this.mapper = mapper;
+            this.emiSchedular = emiSchedular;
         }
         public async Task<bool> AccountExist(int id)
         {
@@ -67,17 +69,34 @@ namespace GoLoan.Infrastructure.Repositories
 
             await AddLoanAccount(account);
 
+            await emiSchedular.GenerateEmiSchedule(account.LoanAccountId);
+
             return mapper.Map<LoanAccountDTO>(account);
         }
 
         public async Task<List<LoanAccount>> GetAccounts()
         {
-            return await db.LoanAccounts.ToListAsync();
+            return await db.LoanAccounts.Include(x => x.Customer)
+        .ToListAsync();
+        }
+
+        public async Task<(List<LoanAccount> Accounts, int TotalCount)> GetAccountsPaged(int pageNumber, int pageSize)
+        {
+            var totalCount = await db.LoanAccounts.CountAsync();
+
+            var accounts = await db.LoanAccounts
+                .Include(x => x.Customer)
+                .OrderBy(x => x.LoanAccountId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (accounts, totalCount);
         }
 
         public async Task<LoanAccount?> GetById(int id)
         {
-            return await  db.LoanAccounts.FirstOrDefaultAsync(x => x.LoanAccountId == id);
+            return await  db.LoanAccounts.Include(x => x.Customer).FirstOrDefaultAsync(x => x.LoanAccountId == id);
         }
 
         public async Task<LoanDeal?> GetDeal(int id)

@@ -53,11 +53,9 @@ namespace GoLoan.Infrastructure.Services
 
             decimal loanamount = loan.LoanAmount;
 
-            decimal totalinterest = loanamount * (decimal)rate
-                * loan.TenureMonths / (100 * 12);
+            decimal totalinterest = loanamount * (decimal)rate* loan.TenureMonths / (100 * 12);
 
-            decimal emi = (loanamount + totalinterest)
-                / loan.TenureMonths;
+            decimal emi = (loanamount + totalinterest)/ loan.TenureMonths;
 
             var data = new SanctionLetterDTO
             {
@@ -71,34 +69,27 @@ namespace GoLoan.Infrastructure.Services
             };
 
             var sanction = mapper.Map<SanctionLetter>(data);
-
             db.SanctionLetters.Add(sanction);
             db.SaveChanges();
-
             return sanction.SanctionId;
         }
 
         public List<SanctionLetterDTO> fetchsanction()
         {
             var data = db.SanctionLetters.ToList();
-
             var mdata = mapper.Map<List<SanctionLetterDTO>>(data);
-
             return mdata;
         }
 
         public SanctionLetterDTO? fetchsanctionbyid(int sanctionid)
         {
-            var data = db.SanctionLetters
-                .FirstOrDefault(x => x.SanctionId == sanctionid);
+            var data = db.SanctionLetters.FirstOrDefault(x => x.SanctionId == sanctionid);
 
             if (data != null)
             {
                 var mdata = mapper.Map<SanctionLetterDTO>(data);
-
                 return mdata;
             }
-
             return null;
         }
 
@@ -107,8 +98,7 @@ namespace GoLoan.Infrastructure.Services
 
         public byte[]? downloadsanction(int sanctionid)
         {
-            var data = db.SanctionLetters
-                .Include(x => x.LoanDeal)
+            var data = db.SanctionLetters.Include(x => x.LoanDeal)
                 .FirstOrDefault(x => x.SanctionId == sanctionid);
 
             if (data == null || data.LoanDeal == null ||

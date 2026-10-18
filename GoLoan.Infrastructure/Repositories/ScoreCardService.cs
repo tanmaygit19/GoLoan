@@ -15,7 +15,6 @@ namespace GoLoan.Infrastructure.Repositories
 
         public ScoreCard? GenerateScoreCard(int id)
         {
-            // Find customer
             var customer = db.Customers.Find(id);
 
             if (customer == null)
@@ -26,6 +25,7 @@ namespace GoLoan.Infrastructure.Repositories
             // Find CIBIL report
             var cibilReport = db.CibilReports
                 .Where(x => x.customerId == id)
+            var cibilReport = db.CibilReports.Where(x => x.customerId == id)
                 .OrderByDescending(x => x.checkDate)
                 .FirstOrDefault();
 
@@ -34,7 +34,6 @@ namespace GoLoan.Infrastructure.Repositories
                 return null;
             }
 
-            // Calculate risk category
             string riskCategory;
 
             if (cibilReport.cibilScore >= 750)
@@ -84,8 +83,17 @@ namespace GoLoan.Infrastructure.Repositories
             scoreCard.EligibleLoanAmount = eligibleLoanAmount;
 
             // Save changes
-            db.SaveChanges();
+            double factor =(Math.Pow(1 + rate, totalInstallments) - 1) /
+                (rate * Math.Pow(1 + rate, totalInstallments));
 
+            decimal eligibleLoanAmount = availableEMI * (decimal)factor;
+
+            ScoreCard scoreCard = new ScoreCard();
+            scoreCard.CustomerId = id;
+            scoreCard.RiskCategory = riskCategory;
+            scoreCard.EligibleLoanAmount = Math.Round(eligibleLoanAmount, 2);
+            db.ScoreCards.Add(scoreCard);
+            db.SaveChanges();
             return scoreCard;
         }
 
