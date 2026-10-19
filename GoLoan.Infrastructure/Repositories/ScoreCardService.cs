@@ -6,7 +6,7 @@ namespace GoLoan.Infrastructure.Repositories
 {
     public class ScoreCardService : IScoreCardService
     {
-        AppDbContext db;
+        private readonly AppDbContext db;
 
         public ScoreCardService(AppDbContext db)
         {
@@ -22,10 +22,8 @@ namespace GoLoan.Infrastructure.Repositories
                 return null;
             }
 
-            // Find CIBIL report
             var cibilReport = db.CibilReports
                 .Where(x => x.customerId == id)
-            var cibilReport = db.CibilReports.Where(x => x.customerId == id)
                 .OrderByDescending(x => x.checkDate)
                 .FirstOrDefault();
 
@@ -49,7 +47,6 @@ namespace GoLoan.Infrastructure.Repositories
                 riskCategory = "High";
             }
 
-            // Calculate eligible loan amount
             decimal monthlyIncome = customer.MonthlyIncome;
             decimal eligibleLoanAmount;
 
@@ -66,34 +63,24 @@ namespace GoLoan.Infrastructure.Repositories
                 eligibleLoanAmount = 1000000;
             }
 
-            // Check existing score card
             var scoreCard = db.ScoreCards
                 .FirstOrDefault(x => x.CustomerId == id);
 
             if (scoreCard == null)
             {
-                scoreCard = new ScoreCard();
-                scoreCard.CustomerId = id;
+                scoreCard = new ScoreCard
+                {
+                    CustomerId = id
+                };
 
                 db.ScoreCards.Add(scoreCard);
             }
 
-            // Update score card
             scoreCard.RiskCategory = riskCategory;
             scoreCard.EligibleLoanAmount = eligibleLoanAmount;
 
-            // Save changes
-            double factor =(Math.Pow(1 + rate, totalInstallments) - 1) /
-                (rate * Math.Pow(1 + rate, totalInstallments));
-
-            decimal eligibleLoanAmount = availableEMI * (decimal)factor;
-
-            ScoreCard scoreCard = new ScoreCard();
-            scoreCard.CustomerId = id;
-            scoreCard.RiskCategory = riskCategory;
-            scoreCard.EligibleLoanAmount = Math.Round(eligibleLoanAmount, 2);
-            db.ScoreCards.Add(scoreCard);
             db.SaveChanges();
+
             return scoreCard;
         }
 
