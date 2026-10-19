@@ -1,5 +1,4 @@
-﻿
-using GoLoan.Application.Interfaces;
+﻿using GoLoan.Application.Interfaces;
 using GoLoan.Domain.Entities;
 using GoLoan.Infrastructure.Data;
 
@@ -7,14 +6,13 @@ namespace GoLoan.Infrastructure.Repositories
 {
     public class EligibilityService : IEligibilityService
     {
-        AppDbContext db;
+        private readonly AppDbContext db;
 
         public EligibilityService(AppDbContext db)
         {
             this.db = db;
         }
 
-        // Get latest eligibility details
         public EligibilityResult? CheckEligibility(int id)
         {
             var result = db.EligibilityResults
@@ -30,7 +28,6 @@ namespace GoLoan.Infrastructure.Repositories
             return result;
         }
 
-        // Customer applies for a loan
         public EligibilityResult? ApplyForLoan(
             int id,
             decimal requestedLoanAmount,
@@ -44,7 +41,6 @@ namespace GoLoan.Infrastructure.Repositories
 
             var cibilReport = db.CibilReports
                 .Where(x => x.customerId == id)
-            var cibilReport = db.CibilReports.Where(x => x.customerId == id)
                 .OrderByDescending(x => x.checkDate)
                 .FirstOrDefault();
 
@@ -53,13 +49,10 @@ namespace GoLoan.Infrastructure.Repositories
                 return null;
             }
 
-            // Get maximum eligible amount from Score Card
             var scoreCard = db.ScoreCards
                 .Where(x => x.CustomerId == id)
                 .OrderByDescending(x => x.ScoreCardId)
                 .FirstOrDefault();
-            string isEligible;
-            string? rejectionReason = null;
 
             if (scoreCard == null)
             {
@@ -68,14 +61,11 @@ namespace GoLoan.Infrastructure.Repositories
 
             decimal eligibleAmount = scoreCard.EligibleLoanAmount;
 
-            // Validate requested amount
-            if (requestedLoanAmount <= 0 ||
-                requestedLoanAmount > eligibleAmount)
+            if (requestedLoanAmount <= 0 || requestedLoanAmount > eligibleAmount)
             {
                 return null;
             }
 
-            // Select interest rate based on tenure
             decimal interestRate;
 
             if (loanTenureMonths == 36)
@@ -93,7 +83,6 @@ namespace GoLoan.Infrastructure.Repositories
                 return null;
             }
 
-            // Calculate monthly EMI
             decimal monthlyRate = interestRate / 1200m;
             double rate = (double)monthlyRate;
             double factor = Math.Pow(1 + rate, loanTenureMonths);
@@ -103,17 +92,10 @@ namespace GoLoan.Infrastructure.Repositories
 
             emi = Math.Round(emi, 2);
 
-            // Decide eligibility status
             string status;
             string? rejectionReason = null;
 
             if (cibilReport.cibilScore >= 800)
-            var scoreCard = db.ScoreCards.Where(x => x.CustomerId == id)
-                .OrderByDescending(x => x.ScoreCardId)
-                .FirstOrDefault();
-
-            decimal loanAmount = 0;
-            if (scoreCard != null)
             {
                 status = "Auto Approved";
             }
@@ -128,31 +110,29 @@ namespace GoLoan.Infrastructure.Repositories
             }
 
             // Save eligibility result
-            var result = new EligibilityResult();
-            EligibilityResult result = new EligibilityResult();
-
-            result.CustomerId = id;
-            result.Customer = customer;
-            result.CibilScore = cibilReport.cibilScore;
-            result.IsEligible = status;
-            result.LoanAmount = eligibleAmount;
-            result.RequestedLoanAmount = requestedLoanAmount;
-            result.LoanTenureMonths = loanTenureMonths;
-            result.InterestRate = interestRate;
-            result.RejectionReason = rejectionReason;
+            var result = new EligibilityResult
+            {
+                CustomerId = id,
+                Customer = customer,
+                CibilScore = cibilReport.cibilScore,
+                IsEligible = status,
+                LoanAmount = eligibleAmount,
+                RequestedLoanAmount = requestedLoanAmount,
+                LoanTenureMonths = loanTenureMonths,
+                InterestRate = interestRate,
+                RejectionReason = rejectionReason
+            };
 
             db.EligibilityResults.Add(result);
             db.SaveChanges();
             return result;
         }
 
-        // Officer approves application
         public EligibilityResult? ApproveApplication(int eligibilityId)
         {
             var result = db.EligibilityResults.Find(eligibilityId);
 
-            if (result == null ||
-                result.IsEligible != "Manual Review")
+            if (result == null || result.IsEligible != "Manual Review")
             {
                 return null;
             }
@@ -165,7 +145,6 @@ namespace GoLoan.Infrastructure.Repositories
             return result;
         }
 
-        // Officer rejects application
         public EligibilityResult? RejectApplication(
             int eligibilityId,
             string rejectionReason)
@@ -187,7 +166,6 @@ namespace GoLoan.Infrastructure.Repositories
             return result;
         }
 
-        // Get applications waiting for officer review
         public List<EligibilityResult> GetManualReviewApplications()
         {
             return db.EligibilityResults
